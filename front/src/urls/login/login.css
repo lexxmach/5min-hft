@@ -1,0 +1,38 @@
+.main-centered {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 95vh;
+    gap: 20px;
+}
+
+.login-label {
+    font-size: 80px;
+    margin-bottom: 0;
+    margin-top: 0;
+}
+
+.login-button {
+    margin-top: 20px;
+    width: 250px;
+    font-size:30px;
+    padding:10px 20px;
+}
+
+input {
+    width: 300px;
+    height: 50px;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-bottom: gray solid 5px;
+    font-family: inherit;
+    font-size: 30px;
+    font-weight: 400;
+}
+
+input:focus {
+    outline: none;
+    border-bottom: black solid 5px;
+}
