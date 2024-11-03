@@ -9,9 +9,9 @@ from jwt.exceptions import InvalidTokenError
 from passlib.context import CryptContext
 
 from dependencies import get_db
-from cruds import crud_credentials
-from models.models import Credentials
-from models.schemas import TokenData
+from src.cruds import crud_credentials
+from src.models.models import Credentials
+from src.models.schemas import TokenData
 from sqlalchemy.orm import Session
 from dotenv import load_dotenv
 
