@@ -1,12 +1,23 @@
 ### Main backend
-To run:
 
-```
-docker build -t core-5min .
-docker run -p 9090:9090 core-5min
-```
+To run the service, do the following:
 
-Swagger UI: http://0.0.0.0:9090/docs
+1. Generate Secret key for JWT:
+    ```bash
+    openssl rand -hex 32
+    ```
+2. Add the Secret key to the file .env to core/src with the following information:
+    ```bash
+    SECRET_KEY=<Your secret key>
+    ALGORITHM=HS256
+    ACCESS_TOKEN_EXPIRE_MINUTES=90
+    ```
+3. Run the following (in core/src):
+        ```
+        docker build -t core-5min .
+        docker run -p 9090:9090 core-5min
+        ```
+4. The Swagger UI is avaiable here: http://0.0.0.0:9090/docs
 
 Endpoints:
 
