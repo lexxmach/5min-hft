@@ -15,9 +15,9 @@ To run the service, do the following:
 3. Run the following (in core/src):
         ```
         docker build -t core-5min .
-        docker run -p 9090:9090 core-5min
+        docker run -p 8000:8000 core-5min
         ```
-4. The Swagger UI is avaiable here: http://0.0.0.0:9090/docs
+4. The Swagger UI is avaiable here: http://0.0.0.0:8000/docs
 
 Endpoints:
 
