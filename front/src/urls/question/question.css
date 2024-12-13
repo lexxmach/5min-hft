@@ -34,3 +34,35 @@
     font-weight: 600;
     color: green;
 }
+
+.splitter {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.question-info {
+    color: gray;
+}
+
+.question-answer-checkbox {
+    width: 30px;
+    height: 20px;
+    margin-top: 20px;
+}
+
+.question-answer-radio {
+    width: 30px;
+    height: 20px;
+    margin-top: 20px;
+}
+
+.options-grid {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.option {
+    width: 50%;
+}

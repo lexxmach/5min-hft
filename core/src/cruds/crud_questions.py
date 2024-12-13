@@ -73,14 +73,6 @@ def create_history_entry(db: Session, user_id: int, user_answer: UserAnswer) -> 
             formatted_user_answer = user_answer.users_answer[0].strip().lower()
             formatted_correct_answer = answer.answer_text.strip().lower()
             is_correct = (formatted_correct_answer == formatted_user_answer)
-    elif question.type == QuestionType.ORDER:
-        correct_answers = db.query(Answers).filter(Answers.question_id == question.id).order_by(Answers.order_position).all()
-        correct_answers = [correct_answer.answer_text for correct_answer in correct_answers]
-        if len(user_answer.users_answer) == len(correct_answers):
-            is_correct = True
-            for given_answer, correct_answer in zip(user_answer.users_answer, correct_answers):
-                if given_answer != correct_answer:
-                    is_correct = False
     elif question.type == QuestionType.CHECKBOX or question.type == QuestionType.RADIO:
         correct_answers = db.query(AnswersMultipleOptions).filter(and_(AnswersMultipleOptions.question_id == question.id, AnswersMultipleOptions.is_correct == True)).all()
         correct_answers = [correct_answer.option_text for correct_answer in correct_answers]
