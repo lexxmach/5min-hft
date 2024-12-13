@@ -10,7 +10,7 @@ from models.models import Answers, AnswersMultipleOptions, History, Questions
 import random
 
 def get_question_by_user_id(db: Session, user_id: int) -> tuple[Questions, list[str]]:
-    subquery = db.query(History.question_id).filter(History.user_id == user_id).subquery()
+    subquery = db.query(History.question_id).filter(and_(History.user_id == user_id, History.correctly_answered == True)).subquery()
     question = db.query(Questions).filter(~Questions.id.in_(subquery)).first()
 
     if question is None:
