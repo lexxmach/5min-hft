@@ -3,7 +3,7 @@ from cruds import crud_questions
 from cruds import crud_credentials, crud_users
 import security
 from fastapi import Depends, APIRouter, HTTPException, status
-from models.schemas import CredentialsModel, UserModel, UserRegister, Token, UserStats
+from models.schemas import CredentialsAccept, CredentialsModel, UserModel, UserRegister, Token, UserStats
 from dependencies import get_db
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordRequestForm
@@ -25,24 +25,24 @@ def new_user(user_credentials: UserRegister, user_info: UserModel, db: Session =
 
 
 @router.post("/token", response_model=Token)
-def login(username: str, password: str, db: Session = Depends(get_db)):
-    db_credentials = crud_credentials.get_credentials_id_by_login(db, username)
+def login(credentials: CredentialsAccept, db: Session = Depends(get_db)):
+    db_credentials = crud_credentials.get_credentials_id_by_login(db, credentials.username)
 
     if db_credentials is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, 
                             detail='Incorrect username')
 
-    if not security.authenticate_user(db_credentials, password):
+    if not security.authenticate_user(db_credentials, credentials.password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, 
                             detail='Incorrect password',
                             headers={"WWW-Authenticate": "Bearer"})
     
-    access_token = security.create_access_token(data={"sub": username})
+    access_token = security.create_access_token(data={"sub": credentials.username})
     return Token(access_token=access_token, token_type="bearer")
 
 
 @router.get("/info", response_model=UserModel)
-def get_user_info(db: Session = Depends(get_db), current_user_id: int = 1):
+def get_user_info(db: Session = Depends(get_db), current_user_id: int = Depends(security.get_current_user_id)):
     user = crud_users.get_user_by_user_id(db, current_user_id)
     
     if user is None:
@@ -52,7 +52,7 @@ def get_user_info(db: Session = Depends(get_db), current_user_id: int = 1):
 
 
 @router.get("/stats", response_model=UserStats)
-def get_user_stats(db: Session = Depends(get_db), current_user_id: int = 1):
+def get_user_stats(db: Session = Depends(get_db), current_user_id: int = Depends(security.get_current_user_id)):
     solved_question_by_user = crud_questions.get_solved_question_by_user(db, current_user_id)
     total_question_by_category = crud_questions.get_total_question_by_category(db)
     

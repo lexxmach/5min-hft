@@ -18,6 +18,10 @@ class CredentialsModel(BaseModel):
     login : str
     password_hash : str
  
+ 
+class CredentialsAccept(BaseModel):
+    login : str
+    password : str
 
 class Token(BaseModel):
     access_token: str
@@ -55,4 +59,15 @@ class SubmitAnswerResponse(BaseModel):
 class UserStats(BaseModel):
     user_id: int
     solved_questions_by_category_count: dict[str, int]
+    total_questions_by_category_count: dict[str, int]
+
+
+class UserStatWithInCategory(BaseModel):
+    user_id: int
+    name: str
+    surname: str
+    tasks_solved: int
+
+class Leaderboard(BaseModel):
+    sorted_users_by_category: dict[str, list[UserStatWithInCategory]]
     total_questions_by_category_count: dict[str, int]

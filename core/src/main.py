@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routers import user_router, questions_router
+from routers import user_router, questions_router, stats_router
 from models import database
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -22,6 +22,7 @@ app.add_middleware(
 )
 
 
+app.include_router(stats_router.router)
 app.include_router(user_router.router)
 app.include_router(questions_router.router)
 
