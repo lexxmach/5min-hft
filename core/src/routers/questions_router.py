@@ -1,17 +1,18 @@
+from models.enums import QuestionType
 from cruds import crud_questions
 from fastapi import Depends, APIRouter, HTTPException
 
 from dependencies import get_db
-from models.schemas import QuizQuestion, UserAnswer
+from models.schemas import QuizQuestion, UserAnswer, QuestionRequest
 from sqlalchemy.orm import Session
 
 router = APIRouter(prefix="/questions", tags=["questions"])
 
 
 @router.get("/", response_model=QuizQuestion)
-def get_question_for_user(db: Session = Depends(get_db)):
+def get_question_for_user(question_type: QuestionType = None, difficulty: int = None, category: str = None, db: Session = Depends(get_db)):
     # Fetch a question not yet answered by the user
-    question, options = crud_questions.get_question_by_user_id(db, 1)
+    question, options = crud_questions.get_question_by_parameters(db, 1, QuestionRequest(type=question_type, difficulty=difficulty, category=category))
     
     if not question:
         raise HTTPException(status_code=404, detail="Question not found")

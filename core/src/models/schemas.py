@@ -41,3 +41,8 @@ class UserAnswer(BaseModel):
     user_id: int
     question_id: int
     users_answer: list[str]
+
+class QuestionRequest(BaseModel):
+    type: Union[QuestionType, None]
+    difficulty: Union[int, None]
+    category: Union[str, None]

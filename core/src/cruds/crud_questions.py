@@ -4,7 +4,7 @@ from models.enums import QuestionType
 from sqlalchemy.orm import Session
 from sqlalchemy import and_
 
-from models.schemas import UserAnswer
+from models.schemas import UserAnswer, QuestionRequest
 from models.models import Answers, AnswersMultipleOptions, History, Questions
 
 def get_question_by_user_id(db: Session, user_id: int) -> tuple[Questions, list[str]]:
@@ -28,6 +28,40 @@ def get_question_by_user_id(db: Session, user_id: int) -> tuple[Questions, list[
     
     return question, answer_options
 
+
+def get_question_by_parameters(db: Session, user_id: int, request: QuestionRequest):
+        subquery = db.query(History.question_id).filter(History.user_id == user_id).subquery()
+        query = db.query(Questions)
+        
+        filters = [~Questions.id.in_(subquery)]
+        if request.type is not None:
+            filters.append(Questions.type == request.type)
+        if request.difficulty is not None:
+            filters.append(Questions.difficulty == request.difficulty)
+        if request.category is not None:
+            filters.append(Questions.category == request.category)
+        
+        if filters:
+            query = query.filter(and_(*filters))
+        question = query.first()
+        
+        if question is None:
+            return None, None
+        
+        answer_options = None
+        if question.type == QuestionType.TEXT:
+            answer_options = None
+        elif question.type == QuestionType.ORDER:
+            answer_options = db.query(Answers).filter(Answers.question_id == question.id).all()
+            answer_options = [answer_option.answer_text for answer_option in answer_options]
+        elif question.type == QuestionType.CHECKBOX or question.type == QuestionType.RADIO:
+            answer_options = db.query(AnswersMultipleOptions).filter(AnswersMultipleOptions.question_id == question.id).all()
+            answer_options = [answer_option.option_text for answer_option in answer_options]
+        else:
+            return None, None
+        
+        return question, answer_options
+    
 
 def create_history_entry(db: Session, user_answer: UserAnswer) -> History:
     question = db.query(Questions).filter(Questions.id == user_answer.question_id).first()
