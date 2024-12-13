@@ -7,6 +7,8 @@ from sqlalchemy import and_
 from models.schemas import UserAnswer, QuestionRequest
 from models.models import Answers, AnswersMultipleOptions, History, Questions
 
+import random
+
 def get_question_by_user_id(db: Session, user_id: int) -> tuple[Questions, list[str]]:
     subquery = db.query(History.question_id).filter(History.user_id == user_id).subquery()
     question = db.query(Questions).filter(~Questions.id.in_(subquery)).first()
@@ -43,7 +45,7 @@ def get_question_by_parameters(db: Session, user_id: int, request: QuestionReque
         
         if filters:
             query = query.filter(and_(*filters))
-        question = query.first()
+        question = random.choice(query.all())
         
         if question is None:
             return None, None
@@ -64,7 +66,7 @@ def get_question_by_parameters(db: Session, user_id: int, request: QuestionReque
     
 
 def create_history_entry(db: Session, current_user_id: int, user_answer: UserAnswer) -> History:
-    question = db.query(Questions).filter(Questions.id == current_user_id).first()
+    question = db.query(Questions).filter(Questions.id == user_answer.question_id).first()
     if question is None:
        return None
    
@@ -73,7 +75,9 @@ def create_history_entry(db: Session, current_user_id: int, user_answer: UserAns
     if question.type == QuestionType.TEXT:
         answer = db.query(Answers).filter(Answers.question_id == question.id).first()
         if len(user_answer.users_answer) == 1:
-            is_correct = answer.answer_text == user_answer.users_answer[0]
+            formatted_user_answer = user_answer.users_answer[0].strip().lower()
+            formatted_correct_answer = answer.answer_text.strip().lower()
+            is_correct = (formatted_correct_answer == formatted_user_answer)
     elif question.type == QuestionType.ORDER:
         correct_answers = db.query(Answers).filter(Answers.question_id == question.id).order_by(Answers.order_position).all()
         correct_answers = [correct_answer.answer_text for correct_answer in correct_answers]
@@ -95,8 +99,8 @@ def create_history_entry(db: Session, current_user_id: int, user_answer: UserAns
     
     history_entry = History(
         user_id=current_user_id,
-        question_id=answer.question_id,
-        users_answer=answer.users_answer,
+        question_id=question.id,
+        users_answer=" ".join(user_answer.users_answer),
         correctly_answered=is_correct,
         timestamp=datetime.now()
     )
