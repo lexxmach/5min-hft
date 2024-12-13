@@ -1,6 +1,6 @@
 from typing import Annotated
 from cruds import crud_questions
-from cruds import crud_credentials
+from cruds import crud_credentials, crud_users
 import security
 from fastapi import Depends, APIRouter, HTTPException, status
 from models.schemas import CredentialsModel, UserModel, UserRegister, Token, UserStats
@@ -25,20 +25,31 @@ def new_user(user_credentials: UserRegister, user_info: UserModel, db: Session =
 
 
 @router.post("/token", response_model=Token)
-def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Session = Depends(get_db)):
-    db_credentials = crud_credentials.get_credentials_id_by_login(db, form_data.username)
+def login(username: str, password: str, db: Session = Depends(get_db)):
+    db_credentials = crud_credentials.get_credentials_id_by_login(db, username)
 
     if db_credentials is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, 
                             detail='Incorrect username')
 
-    if not security.authenticate_user(db_credentials, form_data.password):
+    if not security.authenticate_user(db_credentials, password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, 
                             detail='Incorrect password',
                             headers={"WWW-Authenticate": "Bearer"})
     
-    access_token = security.create_access_token(data={"sub": form_data.username})
+    access_token = security.create_access_token(data={"sub": username})
     return Token(access_token=access_token, token_type="bearer")
+
+
+@router.get("/info", response_model=UserModel)
+def get_user_info(db: Session = Depends(get_db), current_user_id: int = 1):
+    user = crud_users.get_user_by_user_id(db, current_user_id)
+    
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
+    return UserModel(name=user.name, surname=user.surname)
+
 
 @router.get("/stats", response_model=UserStats)
 def get_user_stats(db: Session = Depends(get_db), current_user_id: int = 1):
