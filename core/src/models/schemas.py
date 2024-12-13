@@ -45,3 +45,8 @@ class QuestionRequest(BaseModel):
     type: Union[QuestionType, None]
     difficulty: Union[int, None]
     category: Union[str, None]
+
+class SubmitAnswerResponse(BaseModel):
+    is_answer_correct: bool
+    hint: str
+    correct_answers: list[str]

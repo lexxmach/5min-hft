@@ -5,4 +5,3 @@ class QuestionType(Enum):
     TEXT = "TEXT"
     CHECKBOX = "CHECKBOX"
     RADIO = "RADIO"
-    ORDER = "ORDER"

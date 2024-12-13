@@ -2,37 +2,33 @@ from datetime import datetime
 from pydantic import ValidationError
 from models.enums import QuestionType
 from sqlalchemy.orm import Session
-from sqlalchemy import and_
+from sqlalchemy import and_, delete
 
 from models.schemas import UserAnswer, QuestionRequest
 from models.models import Answers, AnswersMultipleOptions, History, Questions
 
 import random
 
-def get_question_by_user_id(db: Session, user_id: int) -> tuple[Questions, list[str]]:
-    subquery = db.query(History.question_id).filter(and_(History.user_id == user_id, History.correctly_answered == True)).subquery()
-    question = db.query(Questions).filter(~Questions.id.in_(subquery)).first()
+def get_question_by_id(db: Session, question_id: int) -> tuple[Questions, list[str]]:
+    question = db.query(Questions).filter(Questions.id == question_id).first()
 
     if question is None:
         return None, None
 
-    answer_options = None
+    correct_answers = None
     if question.type == QuestionType.TEXT:
-        answer_options = None
-    elif question.type == QuestionType.ORDER:
-        answer_options = db.query(Answers).filter(Answers.question_id == question.id).all()
-        answer_options = [answer_option.answer_text for answer_option in answer_options]
+        correct_answers = [db.query(Answers).filter(Answers.question_id == question.id).first().answer_text]
     elif question.type == QuestionType.CHECKBOX or question.type == QuestionType.RADIO:
-        answer_options = db.query(AnswersMultipleOptions).filter(AnswersMultipleOptions.question_id == question.id).all()
-        answer_options = [answer_option.option_text for answer_option in answer_options]
+        correct_answers = db.query(AnswersMultipleOptions).filter(and_(AnswersMultipleOptions.question_id == question.id, AnswersMultipleOptions.is_correct == True)).all()
+        correct_answers = [answer_option.option_text for answer_option in correct_answers]
     else:
         return None, None
     
-    return question, answer_options
+    return question, correct_answers
 
 
-def get_question_by_parameters(db: Session, user_id: int, request: QuestionRequest):
-        subquery = db.query(History.question_id).filter(History.user_id == user_id).subquery()
+def get_question_by_parameters(db: Session, user_id: int, request: QuestionRequest) -> tuple[Questions, list[str] | None]:
+        subquery = db.query(History.question_id).filter(and_(History.user_id == user_id, History.correctly_answered == True)).subquery()
         query = db.query(Questions)
         
         filters = [~Questions.id.in_(subquery)]
@@ -45,17 +41,16 @@ def get_question_by_parameters(db: Session, user_id: int, request: QuestionReque
         
         if filters:
             query = query.filter(and_(*filters))
-        question = random.choice(query.all())
+        question = query.all()
         
-        if question is None:
+        if len(question) == 0:
             return None, None
+        
+        question = random.choice(question)
         
         answer_options = None
         if question.type == QuestionType.TEXT:
             answer_options = None
-        elif question.type == QuestionType.ORDER:
-            answer_options = db.query(Answers).filter(Answers.question_id == question.id).all()
-            answer_options = [answer_option.answer_text for answer_option in answer_options]
         elif question.type == QuestionType.CHECKBOX or question.type == QuestionType.RADIO:
             answer_options = db.query(AnswersMultipleOptions).filter(AnswersMultipleOptions.question_id == question.id).all()
             answer_options = [answer_option.option_text for answer_option in answer_options]
@@ -65,7 +60,7 @@ def get_question_by_parameters(db: Session, user_id: int, request: QuestionReque
         return question, answer_options
     
 
-def create_history_entry(db: Session, current_user_id: int, user_answer: UserAnswer) -> History:
+def create_history_entry(db: Session, user_id: int, user_answer: UserAnswer) -> History:
     question = db.query(Questions).filter(Questions.id == user_answer.question_id).first()
     if question is None:
        return None
@@ -98,7 +93,7 @@ def create_history_entry(db: Session, current_user_id: int, user_answer: UserAns
         return None, None
     
     history_entry = History(
-        user_id=current_user_id,
+        user_id=user_id,
         question_id=question.id,
         users_answer=" ".join(user_answer.users_answer),
         correctly_answered=is_correct,
@@ -107,3 +102,11 @@ def create_history_entry(db: Session, current_user_id: int, user_answer: UserAns
     db.add(history_entry)
     db.commit()
     return history_entry
+
+
+def clear_history_for_user(db: Session, user_id: int) -> int:
+    number = db.query(History.question_id).filter(History.user_id == user_id).count()
+    stmt = delete(History).where(History.user_id == user_id)
+    db.execute(stmt)
+    db.commit()
+    return number

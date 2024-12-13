@@ -11,6 +11,7 @@ class Questions(Base):
     type = Column(Enum(QuestionType), nullable=False)
     difficulty = Column(Integer, default=1)
     category = Column(String)
+    hint = Column(String)
 
     answers = relationship('Answers', back_populates='question', cascade='all, delete')
     answers_multiple_options = relationship('AnswersMultipleOptions', back_populates='question', cascade='all, delete')
@@ -23,7 +24,6 @@ class Answers(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     question_id = Column(Integer, ForeignKey('questions.id', ondelete='CASCADE'), nullable=False)
     answer_text = Column(String)
-    order_position = Column(Integer)
 
     question = relationship('Questions', back_populates='answers')
 
