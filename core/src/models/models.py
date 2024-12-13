@@ -53,7 +53,7 @@ class Credentials(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey('userdata.id', ondelete='CASCADE'), nullable=False)
     login = Column(String, nullable=False)
-    password = Column(String, nullable=False)
+    password_hash = Column(String, nullable=False)
 
     userdata = relationship('UserData', back_populates='credentials')
 

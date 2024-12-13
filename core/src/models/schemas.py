@@ -7,17 +7,17 @@ from models.enums import QuestionType
 class UserRegister(BaseModel):
     login : str
     password : str
+    
+    
+class UserModel(BaseModel):
+    name : str = Field(default=None)
+    surname : str = Field(default=None)
 
 
 class CredentialsModel(BaseModel):
     login : str
     password_hash : str
  
-    
-class UserModel(BaseModel):
-    name : str = Field(default=None)
-    surname : str = Field(default=None)
-
 
 class Token(BaseModel):
     access_token: str
@@ -38,6 +38,5 @@ class QuizQuestion(BaseModel):
 
 
 class UserAnswer(BaseModel):
-    user_id: int
     question_id: int
     users_answer: str

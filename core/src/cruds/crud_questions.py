@@ -10,7 +10,7 @@ def get_question_by_user_id(db: Session, user_id: int) -> tuple[Questions, list[
     subquery = db.query(History.question_id).filter(History.user_id == user_id).subquery()
     question = db.query(Questions).filter(~Questions.id.in_(subquery)).first()
 
-    if not question:
+    if question is None:
         return None, None
 
     answer_options = None
@@ -28,9 +28,9 @@ def get_question_by_user_id(db: Session, user_id: int) -> tuple[Questions, list[
     return question, answer_options
 
 
-def create_history_entry(db: Session, answer: UserAnswer) -> History:
-    question = db.query(Questions).filter(Questions.id == answer.question_id).first()
-    if not question:
+def create_history_entry(db: Session, current_user_id: int, answer: UserAnswer) -> History:
+    question = db.query(Questions).filter(Questions.id == current_user_id).first()
+    if question is None:
        return None
 
     is_correct = any(
@@ -39,7 +39,7 @@ def create_history_entry(db: Session, answer: UserAnswer) -> History:
     ) if question.type in ['CHECKBOX', 'RADIO'] else False
 
     history_entry = History(
-        user_id=answer.user_id,
+        user_id=current_user_id,
         question_id=answer.question_id,
         users_answer=answer.users_answer,
         correctly_answered=is_correct,

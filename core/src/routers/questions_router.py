@@ -1,5 +1,6 @@
+import security
 from cruds import crud_questions
-from fastapi import Depends, APIRouter, HTTPException
+from fastapi import Depends, APIRouter, HTTPException, status
 
 from dependencies import get_db
 from models.schemas import QuizQuestion, UserAnswer
@@ -9,12 +10,12 @@ router = APIRouter(prefix="/questions", tags=["questions"])
 
 
 @router.get("/", response_model=QuizQuestion)
-def get_question_for_user(db: Session = Depends(get_db)):
+def get_question_for_user(db: Session = Depends(get_db), current_user_id: int = Depends(security.get_current_user_id)):
     # Fetch a question not yet answered by the user
-    question, options = crud_questions.get_question_by_user_id(db, 1)
+    question, options = crud_questions.get_question_by_user_id(db, current_user_id)
     
     if not question:
-        raise HTTPException(status_code=404, detail="Question not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Question not found")
     
     return QuizQuestion(
         id=question.id,
@@ -26,11 +27,11 @@ def get_question_for_user(db: Session = Depends(get_db)):
     )
 
 
-@router.post("/", status_code=201)
-def submit_answer(user_answer: UserAnswer, db: Session = Depends(get_db)):
-    history_entry = crud_questions.create_history_entry(db, user_answer)
+@router.post("/", status_code=status.HTTP_201_CREATED)
+def submit_answer(user_answer: UserAnswer, db: Session = Depends(get_db), current_user_id: int = Depends(security.get_current_user_id)):
+    history_entry = crud_questions.create_history_entry(db, current_user_id, user_answer)
     
     if not history_entry:
-        raise HTTPException(status_code=404, detail="Something went wrong with submitting the answerl")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Something went wrong with submitting the answerl")
 
     return {"message": "Answer submitted successfully", "is_answer_correct": history_entry.correctly_answered}
