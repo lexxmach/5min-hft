@@ -1,0 +1,41 @@
+version: "3"
+services:
+  # Databases:
+  postgresql:
+    container_name: "hft-5min-postgresql"
+    image: postgres:15.5
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=quiz_db
+    ports:
+      - "5432:5432"
+    networks:
+      - hft-5min
+    volumes:
+      - ./tools/database-dev/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: "pg_isready -U postgres"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Services
+  backend:
+    build:
+      dockerfile: ./core/src/Dockerfile
+      context: ./
+    container_name: backend
+    networks:
+      - hft-5min
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgresql:
+        condition: service_healthy
+        restart: true
+
+networks:
+  hft-5min:
+    name: "hft-5min"
