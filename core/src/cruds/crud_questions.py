@@ -2,7 +2,7 @@ from datetime import datetime
 from pydantic import ValidationError
 from models.enums import QuestionType
 from sqlalchemy.orm import Session
-from sqlalchemy import and_, delete
+from sqlalchemy import and_, delete, func
 
 from models.schemas import UserAnswer, QuestionRequest
 from models.models import Answers, AnswersMultipleOptions, History, Questions
@@ -102,3 +102,30 @@ def clear_history_for_user(db: Session, user_id: int) -> int:
     db.execute(stmt)
     db.commit()
     return number
+
+def get_solved_question_by_user(db: Session, user_id: int) -> dict[str, int]:
+    questions = db.query(Questions.category,func.count(func.distinct(Questions.id)).label("unique_id_count")).join(History).filter(and_(History.user_id == user_id, History.correctly_answered == True)).group_by(Questions.category).all()
+    categories = db.query(Questions.category).all()
+    
+    solved_questions_by_category_count = {}
+    for category in categories:
+        solved_questions_by_category_count[category.category] = 0
+    
+    for solved_question in questions:
+        solved_questions_by_category_count[solved_question.category] = solved_question.unique_id_count
+        
+    return solved_questions_by_category_count
+
+
+def get_total_question_by_category(db: Session) -> dict[str, int]:
+    questions = db.query(Questions.category,func.count(func.distinct(Questions.id)).label("unique_id_count")).group_by(Questions.category).all()
+    categories = db.query(Questions.category).all()
+    
+    total_question_by_category = {}
+    for category in categories:
+        total_question_by_category[category.category] = 0
+    
+    for solved_question in questions:
+        total_question_by_category[solved_question.category] = solved_question.unique_id_count
+        
+    return total_question_by_category

@@ -1,8 +1,9 @@
 from typing import Annotated
+from cruds import crud_questions
 from cruds import crud_credentials
 import security
 from fastapi import Depends, APIRouter, HTTPException, status
-from models.schemas import CredentialsModel, UserModel, UserRegister, Token
+from models.schemas import CredentialsModel, UserModel, UserRegister, Token, UserStats
 from dependencies import get_db
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordRequestForm
@@ -38,3 +39,15 @@ def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Sessio
     
     access_token = security.create_access_token(data={"sub": form_data.username})
     return Token(access_token=access_token, token_type="bearer")
+
+@router.get("/stats", response_model=UserStats)
+def get_user_stats(db: Session = Depends(get_db), current_user_id: int = 1):
+    solved_question_by_user = crud_questions.get_solved_question_by_user(db, current_user_id)
+    total_question_by_category = crud_questions.get_total_question_by_category(db)
+    
+    if solved_question_by_user is None or total_question_by_category is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Something went wrong with getting the stats")
+
+    return UserStats(user_id=current_user_id, 
+                    solved_questions_by_category_count=solved_question_by_user,
+                    total_questions_by_category_count=total_question_by_category)
