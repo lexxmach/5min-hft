@@ -2,7 +2,7 @@
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'question_type') THEN
-        CREATE TYPE question_type AS ENUM ('TEXT', 'CHECKBOX', 'RADIO', 'ORDER');
+        CREATE TYPE question_type AS ENUM ('TEXT', 'CHECKBOX', 'RADIO');
     END IF;
 END $$;
 
@@ -12,15 +12,15 @@ CREATE TABLE Questions (
     text VARCHAR NOT NULL,
     type question_type NOT NULL,
     difficulty INT DEFAULT 1,
-    category VARCHAR
+    category VARCHAR,
+    hint VARCHAR
 );
 
 -- Create Answers Table (for TEXT, ORDER types)
 CREATE TABLE Answers (
     id SERIAL PRIMARY KEY,
     question_id INT REFERENCES Questions(id) ON DELETE CASCADE,
-    answer_text VARCHAR,
-    order_position INT
+    answer_text VARCHAR
 );
 
 -- Create AnswersMultipleOptions Table (for CHECKBOX, RADIO types)
@@ -57,17 +57,13 @@ CREATE TABLE History (
 );
 
 -- TEST DATA DELETE
-INSERT INTO questions (text, type, difficulty, category) VALUES
-('What is the capital of France?', 'TEXT', 1, 'Geography'),
-('Select the prime numbers.', 'CHECKBOX', 2, 'Mathematics'),
-('What is 2 + 2?', 'RADIO', 1, 'Mathematics'),
-('Arrange these planets by size.', 'ORDER', 3, 'Astronomy');
+INSERT INTO questions (text, type, difficulty, category, hint) VALUES
+('What is the capital of France?', 'TEXT', 1, 'Geography', 'City of love'),
+('Select the prime numbers.', 'CHECKBOX', 2, 'Mathematics', 'Prime numbers are numbers that have only 2 factors: 1 and themselves.'),
+('What is 2 + 2?', 'RADIO', 1, 'Mathematics', 'There is no catch!');
 
-INSERT INTO answers (question_id, answer_text, order_position) VALUES
-(1, 'Paris', NULL),
-(4, 'Jupiter', 1),
-(4, 'Saturn', 2),
-(4, 'Neptune', 3);
+INSERT INTO answers (question_id, answer_text) VALUES
+(1, 'Paris');
 
 INSERT INTO answersmultipleoptions (question_id, option_text, is_correct) VALUES
 (2, '2', TRUE),
