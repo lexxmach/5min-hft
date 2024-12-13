@@ -70,7 +70,7 @@ INSERT INTO answers (question_id, answer_text, order_position) VALUES
 (4, 'Neptune', 3);
 
 INSERT INTO answersmultipleoptions (question_id, option_text, is_correct) VALUES
-(2, '2', FALSE),
+(2, '2', TRUE),
 (2, '3', TRUE),
 (2, '5', TRUE),
 (2, '6', FALSE),
