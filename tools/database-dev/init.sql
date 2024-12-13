@@ -43,7 +43,7 @@ CREATE TABLE Credentials (
     id SERIAL PRIMARY KEY,
     user_id INT REFERENCES UserData(id) ON DELETE CASCADE,
     login VARCHAR NOT NULL,
-    password VARCHAR NOT NULL
+    password_hash VARCHAR NOT NULL
 );
 
 -- Create History Table
@@ -57,31 +57,31 @@ CREATE TABLE History (
 );
 
 -- TEST DATA DELETE
-INSERT INTO questions (id, text, type, difficulty, category) VALUES
-(1, 'What is the capital of France?', 'TEXT', 1, 'Geography'),
-(2, 'Select the prime numbers.', 'CHECKBOX', 2, 'Mathematics'),
-(3, 'What is 2 + 2?', 'RADIO', 1, 'Mathematics'),
-(4, 'Arrange these planets by size.', 'ORDER', 3, 'Astronomy');
+INSERT INTO questions (text, type, difficulty, category) VALUES
+('What is the capital of France?', 'TEXT', 1, 'Geography'),
+('Select the prime numbers.', 'CHECKBOX', 2, 'Mathematics'),
+('What is 2 + 2?', 'RADIO', 1, 'Mathematics'),
+('Arrange these planets by size.', 'ORDER', 3, 'Astronomy');
 
-INSERT INTO answers (id, question_id, answer_text, order_position) VALUES
-(1, 1, 'Paris', NULL),
-(2, 4, 'Jupiter', 1),
-(3, 4, 'Saturn', 2),
-(4, 4, 'Neptune', 3);
+INSERT INTO answers (question_id, answer_text, order_position) VALUES
+(1, 'Paris', NULL),
+(4, 'Jupiter', 1),
+(4, 'Saturn', 2),
+(4, 'Neptune', 3);
 
-INSERT INTO answersmultipleoptions (id, question_id, option_text, is_correct) VALUES
-(1, 2, '2', TRUE),
-(2, 2, '3', TRUE),
-(3, 2, '5', TRUE),
-(4, 2, '6', FALSE),
-(5, 3, '3', FALSE),
-(6, 3, '4', TRUE),
-(7, 3, '5', FALSE);
+INSERT INTO answersmultipleoptions (question_id, option_text, is_correct) VALUES
+(2, '2', TRUE),
+(2, '3', TRUE),
+(2, '5', TRUE),
+(2, '6', FALSE),
+(3, '3', FALSE),
+(3, '4', TRUE),
+(3, '5', FALSE);
 
-INSERT INTO userdata (id, name, surname) VALUES
-(1, 'Alice', 'Johnson'),
-(2, 'Bob', 'Smith');
+INSERT INTO userdata (name, surname) VALUES
+('Alice', 'Johnson'),
+('Bob', 'Smith');
 
-INSERT INTO credentials (id, user_id, login, password) VALUES
-(1, 1, 'alice123', 'passalice'),
-(2, 2, 'bob_the_best', 'passbob');
+INSERT INTO credentials (user_id, login, password_hash) VALUES
+(1, 'alice123', 'passalice'),
+(2, 'bob_the_best', 'passbob');

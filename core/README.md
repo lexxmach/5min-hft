@@ -10,7 +10,7 @@ To run the service, do the following:
     ```bash
     SECRET_KEY=<Your secret key>
     ALGORITHM=HS256
-    ACCESS_TOKEN_EXPIRE_MINUTES=90
+    ACCESS_TOKEN_EXPIRE_MINUTES=180
     ```
 3. Run the following (in core/src):
     ```
@@ -21,6 +21,7 @@ To run the service, do the following:
 
 Endpoints:
 
-- /user/register/ - register a user with the new username and password
-- /user/login/ - log in the user, return the auth token
+- register/ - register a user with the new username and password
+- login/ - log in the user, return the auth token. Впоследствии для получения вопросов или отправки ответов надо будет прикладывать этот токен.
+    - В Swagger UI это можно сделать просто нажав Authorize в правом верхнем углу, ввести логин и пароль и после этого все операции будут доступны
 - questions/ - returns a new question based on the logged-in user
