@@ -2,7 +2,7 @@ from datetime import datetime
 from pydantic import ValidationError
 from models.enums import QuestionType
 from sqlalchemy.orm import Session
-from sqlalchemy import and_, delete
+from sqlalchemy import and_, delete, func
 
 from models.schemas import UserAnswer, QuestionRequest
 from models.models import Answers, AnswersMultipleOptions, History, Questions
@@ -73,14 +73,6 @@ def create_history_entry(db: Session, user_id: int, user_answer: UserAnswer) -> 
             formatted_user_answer = user_answer.users_answer[0].strip().lower()
             formatted_correct_answer = answer.answer_text.strip().lower()
             is_correct = (formatted_correct_answer == formatted_user_answer)
-    elif question.type == QuestionType.ORDER:
-        correct_answers = db.query(Answers).filter(Answers.question_id == question.id).order_by(Answers.order_position).all()
-        correct_answers = [correct_answer.answer_text for correct_answer in correct_answers]
-        if len(user_answer.users_answer) == len(correct_answers):
-            is_correct = True
-            for given_answer, correct_answer in zip(user_answer.users_answer, correct_answers):
-                if given_answer != correct_answer:
-                    is_correct = False
     elif question.type == QuestionType.CHECKBOX or question.type == QuestionType.RADIO:
         correct_answers = db.query(AnswersMultipleOptions).filter(and_(AnswersMultipleOptions.question_id == question.id, AnswersMultipleOptions.is_correct == True)).all()
         correct_answers = [correct_answer.option_text for correct_answer in correct_answers]
@@ -110,3 +102,30 @@ def clear_history_for_user(db: Session, user_id: int) -> int:
     db.execute(stmt)
     db.commit()
     return number
+
+def get_solved_question_by_user(db: Session, user_id: int) -> dict[str, int]:
+    questions = db.query(Questions.category,func.count(func.distinct(Questions.id)).label("unique_id_count")).join(History).filter(and_(History.user_id == user_id, History.correctly_answered == True)).group_by(Questions.category).all()
+    categories = db.query(Questions.category).all()
+    
+    solved_questions_by_category_count = {}
+    for category in categories:
+        solved_questions_by_category_count[category.category] = 0
+    
+    for solved_question in questions:
+        solved_questions_by_category_count[solved_question.category] = solved_question.unique_id_count
+        
+    return solved_questions_by_category_count
+
+
+def get_total_question_by_category(db: Session) -> dict[str, int]:
+    questions = db.query(Questions.category,func.count(func.distinct(Questions.id)).label("unique_id_count")).group_by(Questions.category).all()
+    categories = db.query(Questions.category).all()
+    
+    total_question_by_category = {}
+    for category in categories:
+        total_question_by_category[category.category] = 0
+    
+    for solved_question in questions:
+        total_question_by_category[solved_question.category] = solved_question.unique_id_count
+        
+    return total_question_by_category

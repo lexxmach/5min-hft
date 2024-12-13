@@ -50,3 +50,9 @@ class SubmitAnswerResponse(BaseModel):
     is_answer_correct: bool
     hint: str
     correct_answers: list[str]
+
+
+class UserStats(BaseModel):
+    user_id: int
+    solved_questions_by_category_count: dict[str, int]
+    total_questions_by_category_count: dict[str, int]
