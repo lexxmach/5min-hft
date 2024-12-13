@@ -1,6 +1,6 @@
 from fastapi import FastAPI
-from src.routers import user_router, questions_router
-from src.models import database
+from routers import user_router, questions_router
+from models import database
 from fastapi.middleware.cors import CORSMiddleware
 
 

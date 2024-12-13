@@ -1,4 +1,4 @@
-from src.models import database
+from models import database
 
 def get_db():
     db = database.SessionLocal()

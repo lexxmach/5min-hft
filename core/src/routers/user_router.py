@@ -1,7 +1,7 @@
-from src.cruds import crud_credentials
+from cruds import crud_credentials
 import security
 from fastapi import Depends, APIRouter, HTTPException, status
-from src.models.schemas import CredentialsModel, UserRegister, Token
+from models.schemas import CredentialsModel, UserRegister, Token
 from dependencies import get_db
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordRequestForm

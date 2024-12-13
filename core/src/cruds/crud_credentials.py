@@ -1,8 +1,8 @@
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
-from src.models.schemas import CredentialsModel
-from src.models.models import Credentials
+from models.schemas import CredentialsModel
+from models.models import Credentials
 
 def get_credentials_by_credentials_id(db: Session, credentials_id: int) -> Credentials:
     return None

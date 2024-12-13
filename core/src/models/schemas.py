@@ -1,6 +1,8 @@
 from typing import Union
 from pydantic import BaseModel, Field
 
+from models.enums import QuestionType
+
 
 class UserRegister(BaseModel):
     login : str
@@ -17,11 +19,6 @@ class UserModel(BaseModel):
     surname : str = Field(default=None)
 
 
-class QuizQuestion(BaseModel):
-    question : str
-    answer : str
-
-
 class Token(BaseModel):
     access_token: str
     token_type: str
@@ -29,3 +26,18 @@ class Token(BaseModel):
     
 class TokenData(BaseModel):
     username: Union[str, None] = None
+    
+    
+class QuizQuestion(BaseModel):
+    id: int
+    question: str
+    type: QuestionType
+    options: Union[list[str], None]  # List of option texts
+    difficulty: int
+    category: str
+
+
+class UserAnswer(BaseModel):
+    user_id: int
+    question_id: int
+    users_answer: str
