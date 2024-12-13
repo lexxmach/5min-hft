@@ -40,4 +40,4 @@ class QuizQuestion(BaseModel):
 class UserAnswer(BaseModel):
     user_id: int
     question_id: int
-    users_answer: str
+    users_answer: list[str]

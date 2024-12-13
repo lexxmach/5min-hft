@@ -2,6 +2,7 @@ from datetime import datetime
 from pydantic import ValidationError
 from models.enums import QuestionType
 from sqlalchemy.orm import Session
+from sqlalchemy import and_
 
 from models.schemas import UserAnswer
 from models.models import Answers, AnswersMultipleOptions, History, Questions
@@ -28,20 +29,40 @@ def get_question_by_user_id(db: Session, user_id: int) -> tuple[Questions, list[
     return question, answer_options
 
 
-def create_history_entry(db: Session, answer: UserAnswer) -> History:
-    question = db.query(Questions).filter(Questions.id == answer.question_id).first()
+def create_history_entry(db: Session, user_answer: UserAnswer) -> History:
+    question = db.query(Questions).filter(Questions.id == user_answer.question_id).first()
     if not question:
        return None
+   
+    is_correct = False
 
-    is_correct = any(
-        option.is_correct and option.option_text == answer.users_answer
-        for option in question.options
-    ) if question.type in ['CHECKBOX', 'RADIO'] else False
-
+    if question.type == QuestionType.TEXT:
+        answer = db.query(Answers).filter(Answers.question_id == question.id).first()
+        if len(user_answer.users_answer) == 1:
+            is_correct = answer.answer_text == user_answer.users_answer[0]
+    elif question.type == QuestionType.ORDER:
+        correct_answers = db.query(Answers).filter(Answers.question_id == question.id).order_by(Answers.order_position).all()
+        correct_answers = [correct_answer.answer_text for correct_answer in correct_answers]
+        if len(user_answer.users_answer) == len(correct_answers):
+            is_correct = True
+            for given_answer, correct_answer in zip(user_answer.users_answer, correct_answers):
+                if given_answer != correct_answer:
+                    is_correct = False
+    elif question.type == QuestionType.CHECKBOX or question.type == QuestionType.RADIO:
+        correct_answers = db.query(AnswersMultipleOptions).filter(and_(AnswersMultipleOptions.question_id == question.id, AnswersMultipleOptions.is_correct == True)).all()
+        correct_answers = [correct_answer.option_text for correct_answer in correct_answers]
+        if len(user_answer.users_answer) == len(correct_answers):
+            is_correct = True
+            for given_answer, correct_answer in zip(sorted(user_answer.users_answer), sorted(correct_answers)):
+                if given_answer != correct_answer:
+                    is_correct = False
+    else:
+        return None, None
+    
     history_entry = History(
-        user_id=answer.user_id,
-        question_id=answer.question_id,
-        users_answer=answer.users_answer,
+        user_id=user_answer.user_id,
+        question_id=user_answer.question_id,
+        users_answer=user_answer.users_answer,
         correctly_answered=is_correct,
         timestamp=datetime.now()
     )
