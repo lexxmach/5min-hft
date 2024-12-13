@@ -15,7 +15,7 @@ def get_question_for_user(question_type: QuestionType = None, difficulty: int = 
     # Fetch a question not yet answered by the user
     question, options = crud_questions.get_question_by_parameters(db, current_user_id, QuestionRequest(type=question_type, difficulty=difficulty, category=category))
     
-    if not question:
+    if question is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Question not found")
     
     return QuizQuestion(
@@ -32,7 +32,7 @@ def get_question_for_user(question_type: QuestionType = None, difficulty: int = 
 def submit_answer(user_answer: UserAnswer, db: Session = Depends(get_db), current_user_id: int = Depends(security.get_current_user_id)):
     history_entry = crud_questions.create_history_entry(db, current_user_id, user_answer)
     
-    if not history_entry:
+    if history_entry is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Something went wrong with submitting the answerl")
 
     return {"message": "Answer submitted successfully", "is_answer_correct": history_entry.correctly_answered}
