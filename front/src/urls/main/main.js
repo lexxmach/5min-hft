@@ -15,7 +15,9 @@ class Main extends React.Component {
                 <form action="http://localhost:3000/login">
                     <button className='green-button'>Войти</button>
                 </form>
-                <button className='blue-button'>Зарегистрироваться</button>
+                <form action="http://localhost:3000/register">
+                    <button className='blue-button'>Зарегистрироваться</button>
+                </form>
             </div>
         );
     }

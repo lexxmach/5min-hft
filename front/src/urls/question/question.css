@@ -66,3 +66,16 @@
 .option {
     width: 50%;
 }
+
+.header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.header-href {
+    text-decoration: none;
+    color: blue;
+    font-size: 30px;
+    font-weight: bold;
+}

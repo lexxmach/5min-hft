@@ -30,8 +30,14 @@ class Question extends React.Component {
     }
 
     componentDidMount() {
+        const token = localStorage.getItem('token');
+
         let url = 'http://localhost:8000/questions/';
-        axios.get(url).then(res => {
+        axios.get(url, {
+            headers: {
+                Authorization: 'Bearer ' + token
+            }
+        }).then(res => {
             let data = res.data;
             this.setState({
                 dataLoaded: true,
@@ -43,18 +49,38 @@ class Question extends React.Component {
                 type: data['type'],
                 options: data['options'],
                 hint: data['hint'],
+                name: '',
+                surname: '',
+            })
+        });
+
+        url = 'http://localhost:8000/info/';
+        axios.get(url, {
+            headers: {
+                Authorization: 'Bearer ' + token
+            }
+        }).then(res => {
+            let data = res.data;
+            this.setState({
+                name: data['name'],
+                surname: data['surname'],
             })
         });
     }
 
     onAnswer(e) {
         e.preventDefault();
+        const token = localStorage.getItem('token');
 
         let url = 'http://localhost:8000/questions/';
         axios.post(url, {
             'user_id': 1,
             'question_id': this.state.question_id,
             'users_answer': this.state.current_ans
+        }, {
+            headers: {
+                Authorization: 'Bearer ' + token
+            }
         }).then(res => {
             let data = res.data;
             if (data['is_answer_correct']) {
@@ -187,29 +213,37 @@ class Question extends React.Component {
     render() {
         if (this.state.dataLoaded) {
             return (
-                <div className='question-main'>
-                    <h1 className='question-label'>Воспрос №{this.state.question_id}:</h1>
-                    <div className='wide-element'>
-                        <div className='splitter'>
-                            <span className='question-info'>Сложность: {this.state.difficulty}</span>
-                            <span className='question-info'>Категория: {this.state.category}</span>
+                <>
+                    <div className='header'>
+                        <a href='/' className='header-href'>Меню</a>
+                        <a href='/question' className='header-href'>Вопросы</a>
+                        <a href='/leaderboard' className='header-href'>Лидерборд</a>
+                        <a href='/profile' className='header-href'>{this.state.name}</a>
+                    </div>
+                    <div className='question-main'>
+                        <h1 className='question-label'>Воспрос №{this.state.question_id}:</h1>
+                        <div className='wide-element'>
+                            <div className='splitter'>
+                                <span className='question-info'>Сложность: {this.state.difficulty}</span>
+                                <span className='question-info'>Категория: {this.state.category}</span>
+                            </div>
                         </div>
+                        <div className='wide-element'>
+                            <TypeAnimation
+                                sequence={[
+                                    this.state.question
+                                ]}
+                                wrapper="span"
+                                speed={100}
+                                cursor={false}
+                                style={{
+                                    display: 'block',
+                                }}
+                            />
+                        </div>
+                        {this.getPanel()}
                     </div>
-                    <div className='wide-element'>
-                        <TypeAnimation
-                            sequence={[
-                                this.state.question
-                            ]}
-                            wrapper="span"
-                            speed={100}
-                            cursor={false}
-                            style={{
-                                display: 'block',
-                            }}
-                        />
-                    </div>
-                    {this.getPanel()}
-                </div>
+                </>
             );
         } else {
             return (

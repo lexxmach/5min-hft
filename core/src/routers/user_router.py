@@ -26,7 +26,7 @@ def new_user(user_credentials: UserRegister, user_info: UserModel, db: Session =
 
 @router.post("/token", response_model=Token)
 def login(credentials: CredentialsAccept, db: Session = Depends(get_db)):
-    db_credentials = crud_credentials.get_credentials_id_by_login(db, credentials.username)
+    db_credentials = crud_credentials.get_credentials_id_by_login(db, credentials.login)
 
     if db_credentials is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, 
@@ -37,7 +37,7 @@ def login(credentials: CredentialsAccept, db: Session = Depends(get_db)):
                             detail='Incorrect password',
                             headers={"WWW-Authenticate": "Bearer"})
     
-    access_token = security.create_access_token(data={"sub": credentials.username})
+    access_token = security.create_access_token(data={"sub": credentials.login})
     return Token(access_token=access_token, token_type="bearer")
 
 
