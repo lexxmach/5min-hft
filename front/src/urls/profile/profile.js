@@ -52,7 +52,7 @@ class Profile extends React.Component {
             result.push(
                 <div className='stats-item'>
                     <span className='bold'>{category}: </span>
-                    <span>{this.state.solved_by_category[category]}/{this.state.total_by_category[category]}</span>
+                    <span>{this.state.solved_by_category[category]}</span>
                 </div>
             )
         }
@@ -74,7 +74,7 @@ class Profile extends React.Component {
                         <h1 className='profile-big-name'>{this.state.name + ' ' + this.state.surname}</h1>
                     </div>
                     <div className='wide-element'>
-                        <span>Статистика решенных пользователем задач по категориям (решено/всего):</span>
+                        <span>Статистика решенных пользователем задач по категориям:</span>
                     </div>
                     <div className='wide-element'>
                         {this.genStats()}
