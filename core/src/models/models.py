@@ -43,6 +43,7 @@ class UserData(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, nullable=False)
     surname = Column(String, nullable=False)
+    is_root = Column(Boolean, nullable=False)
 
     credentials = relationship('Credentials', back_populates='userdata', cascade='all, delete')
     history = relationship('History', back_populates='userdata', cascade='all, delete')

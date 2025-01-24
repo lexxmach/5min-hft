@@ -35,7 +35,8 @@ CREATE TABLE AnswersMultipleOptions (
 CREATE TABLE UserData (
     id SERIAL PRIMARY KEY,
     name VARCHAR NOT NULL,
-    surname VARCHAR NOT NULL
+    surname VARCHAR NOT NULL,
+    is_root BOOLEAN NOT NULL
 );
 
 -- Create Credentials Table

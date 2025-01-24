@@ -1,5 +1,5 @@
 from pydantic import ValidationError
-from sqlalchemy.orm import Session
+from common.repo.repository import DatabaseRepository
 from sqlalchemy import func
 
 
@@ -7,22 +7,25 @@ from models.schemas import UserModel, UserStatWithInCategory
 from models.models import History, Questions, UserData
 
 
-def create_user(db : Session, user_info: UserModel) -> int:
+def create_user(repo: DatabaseRepository, user_info: UserModel) -> int:
     try:
-        db_user = UserData(name=user_info.name, surname=user_info.surname)
+        db_user = {"name": user_info.name, "surname": user_info.surname, "is_root": False}
     except ValidationError:
         return None
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    return db_user.id
+    created_user = repo.create(db_user, model=UserData)
+    return created_user.id
 
-def get_user_by_user_id(db: Session, user_id: int) -> UserData:
-    return db.query(UserData).filter(UserData.id == user_id).first()
 
-def get_leaderboard_by_category(db: Session):
+def get_user_by_user_id(repo: DatabaseRepository, user_id: int) -> UserData:
+    user = repo.filter(UserData.id == user_id, model=UserData)
+    if not user:
+        return None
+    return user[0]
+
+
+def get_leaderboard_by_category(repo: DatabaseRepository):
     raw_leaderboard = (
-        db.query(
+        repo.session.query(
             Questions.category,
             UserData.id.label('user_id'),
             UserData.name,
@@ -49,3 +52,7 @@ def get_leaderboard_by_category(db: Session):
         leaderboard[category].append(user_data)
 
     return leaderboard
+
+def is_user_root(repo: DatabaseRepository, user_id: int):
+    user = get_user_by_user_id(repo, user_id)
+    return user.is_root
