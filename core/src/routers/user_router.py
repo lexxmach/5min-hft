@@ -4,7 +4,7 @@ from cruds import crud_questions
 from cruds import crud_credentials, crud_users
 import security
 from fastapi import Depends, APIRouter, HTTPException, status
-from models.schemas import CredentialsModel, UserModel, UserRegister, Token, UserStats
+from models.schemas import CredentialsAccept, CredentialsModel, UserModel, UserRegister, Token, UserStats
 from dependencies import get_repo
 from fastapi.security import OAuth2PasswordRequestForm
 
