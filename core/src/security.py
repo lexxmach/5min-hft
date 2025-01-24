@@ -2,17 +2,17 @@ from datetime import datetime, timedelta, timezone
 import os
 from typing import Annotated, Union
 
+from common.repo.repository import DatabaseRepository
 import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
 from passlib.context import CryptContext
 
-from dependencies import get_db
+from dependencies import get_repo
 from cruds import crud_credentials
 from models.models import Credentials
 from models.schemas import TokenData
-from sqlalchemy.orm import Session
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -32,7 +32,7 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
     return encoded_jwt
 
 
-def get_current_user_id(token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_db)) -> int:
+def get_current_user_id(token: Annotated[str, Depends(oauth2_scheme)], repo: DatabaseRepository = Depends(get_repo)) -> int:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -46,7 +46,7 @@ def get_current_user_id(token: Annotated[str, Depends(oauth2_scheme)], db: Sessi
         token_data = TokenData(username=username)
     except InvalidTokenError:
         raise credentials_exception
-    user_id = crud_credentials.get_user_id_by_login(db, login=token_data.username)
+    user_id = crud_credentials.get_user_id_by_login(repo, login=token_data.username)
     if user_id is None:
         raise credentials_exception
     return user_id

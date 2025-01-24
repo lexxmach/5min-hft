@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Optional, Union
 from pydantic import BaseModel, Field
 
 from models.enums import QuestionType
@@ -71,3 +71,21 @@ class UserStatWithInCategory(BaseModel):
 class Leaderboard(BaseModel):
     sorted_users_by_category: dict[str, list[UserStatWithInCategory]]
     total_questions_by_category_count: dict[str, int]
+
+class AnswerBase(BaseModel):
+    answer_text: str
+
+class AnswerMultipleOptionsBase(BaseModel):
+    option_text: str
+    is_correct: bool
+
+
+class SubmitNewQuestion(BaseModel):
+    question_text: str
+    type: QuestionType
+    difficulty: int
+    category: str
+    hint: str
+
+    answer: Optional[AnswerBase] = None
+    answers_multiple_options: Optional[list[AnswerMultipleOptionsBase]] = None
