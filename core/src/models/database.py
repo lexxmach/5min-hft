@@ -1,5 +1,7 @@
 from sqlalchemy import create_engine, URL
 from sqlalchemy.orm import declarative_base
+from sqlalchemy.orm import sessionmaker
+
 
 DATABASE_URL = DATABASE_URL = URL.create(
         drivername="postgresql",
@@ -12,3 +14,4 @@ DATABASE_URL = DATABASE_URL = URL.create(
 
 engine = create_engine(DATABASE_URL)
 Base = declarative_base()
+SessionLocal = sessionmaker(bind=engine)

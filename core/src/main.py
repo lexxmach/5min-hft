@@ -1,13 +1,22 @@
+import threading
 from fastapi import FastAPI
-from routers import user_router, questions_router, stats_router
-from models import database
+from routers import user_router, questions_router, stats_router, security_router
 from fastapi.middleware.cors import CORSMiddleware
+from helpers import telegram_admin_bot
+from contextlib import asynccontextmanager
+
+# Global variable to control the bot thread
+bot_thread = None
+should_stop = threading.Event()
 
 
-database.Base.metadata.create_all(bind=database.engine)
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    await telegram_admin_bot.start_bot()
+    yield
 
 
-app = FastAPI()
+app = FastAPI(lifespan=lifespan)
 
 origins = [
     "http://localhost:3000",
@@ -25,6 +34,8 @@ app.add_middleware(
 app.include_router(stats_router.router)
 app.include_router(user_router.router)
 app.include_router(questions_router.router)
+app.include_router(security_router.router)
+
 
 @app.get("/")
 async def root():
