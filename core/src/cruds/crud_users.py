@@ -56,3 +56,7 @@ def get_leaderboard_by_category(repo: DatabaseRepository):
 def is_user_root(repo: DatabaseRepository, user_id: int):
     user = get_user_by_user_id(repo, user_id)
     return user.is_root
+
+
+def make_user_root(repo: DatabaseRepository, user_id: int):
+    repo.update(UserData.id == user_id, data={"is_root": True}, model=UserData)
