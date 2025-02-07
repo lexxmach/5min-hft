@@ -42,19 +42,23 @@ def create_question(repo: DatabaseRepository, new_question: SubmitNewQuestion) -
 def get_question_by_id(repo: DatabaseRepository, question_id: int) -> tuple[Questions, list[str]]:
     question = repo.filter(Questions.id == question_id, model=Questions)
     if not question:
-        return None, None
+        return None, None, None
     question = question[0]
     
     correct_answers = None
+    answers = None
     if question.type == QuestionType.TEXT:
         correct_answers = [repo.filter(Answers.question_id == question.id, model=Answers)[0].answer_text]
+        answers = [repo.filter(Answers.question_id == question.id, model=Answers)[0].answer_text]
     elif question.type == QuestionType.CHECKBOX or question.type == QuestionType.RADIO:
         correct_answers = repo.filter(and_(AnswersMultipleOptions.question_id == question.id, AnswersMultipleOptions.is_correct == True), model=AnswersMultipleOptions)
         correct_answers = [answer_option.option_text for answer_option in correct_answers]
+        answers = repo.filter(AnswersMultipleOptions.question_id == question.id, model=AnswersMultipleOptions)
+        answers = [answer_option.option_text for answer_option in answers]
     else:
-        return None, None
+        return None, None, None
     
-    return question, correct_answers
+    return question, correct_answers, answers
 
 
 def get_question_by_parameters(repo: DatabaseRepository, user_id: int, request: QuestionRequest) -> tuple[Questions, list[str] | None]:

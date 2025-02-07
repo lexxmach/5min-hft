@@ -79,3 +79,7 @@ def get_user_stats(repo: DatabaseRepository= Depends(get_repo), current_user_id:
     return UserStats(user_id=current_user_id, 
                     solved_questions_by_category_count=solved_question_by_user,
                     total_questions_by_category_count=total_question_by_category)
+    
+@router.get("/is_root", response_model=bool)
+def is_user_root(repo: DatabaseRepository= Depends(get_repo), current_user_id: int = Depends(security.get_current_user_id)):
+    return crud_users.is_user_root(repo, current_user_id)
