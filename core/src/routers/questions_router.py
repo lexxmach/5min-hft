@@ -28,11 +28,25 @@ def get_question_for_user(question_type: QuestionType = None, difficulty: int = 
         category=question.category,
     )
 
+@router.get("/by-id", response_model=QuizQuestion)
+def get_question_by_id(question_id: int, repo: DatabaseRepository = Depends(get_repo)):
+    question, correct_answers, answers = crud_questions.get_question_by_id(repo, question_id)
+    if question is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Question with this id does not exist")
+    return QuizQuestion(
+        id=question.id,
+        question=question.text,
+        type=question.type,
+        options=answers,
+        difficulty=question.difficulty,
+        category=question.category,
+    )
+    
 
-@router.post("/", status_code=status.HTTP_201_CREATED, response_model=SubmitAnswerResponse)
+@router.post("/submit-answer", status_code=status.HTTP_201_CREATED, response_model=SubmitAnswerResponse)
 def submit_answer(user_answer: UserAnswer, repo: DatabaseRepository = Depends(get_repo), current_user_id: int = Depends(security.get_current_user_id)):
     history_entry = crud_questions.create_history_entry(repo, current_user_id, user_answer)
-    question, correct_answers = crud_questions.get_question_by_id(repo, user_answer.question_id)
+    question, correct_answers, answers = crud_questions.get_question_by_id(repo, user_answer.question_id)
     
     if history_entry is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Something went wrong with submitting the answer")
