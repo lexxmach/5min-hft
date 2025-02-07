@@ -1,0 +1,49 @@
+.question-button-splitted {
+    margin-top: 20px;
+    width: 30%;
+    font-size:30px;
+    padding:10px 20px;
+}
+
+.question-button-splitted-2x-green {
+    margin-top: 20px;
+    width: 45%;
+    font-size:23px;
+    padding:10px 20px;
+}
+
+.question-button-splitted-2x-blue {
+    margin-top: 20px;
+    width: 45%;
+    font-size:23px;
+    padding:10px 20px;
+
+    color: rgb(255, 255, 255);
+    background:#1fb0e9;
+    box-shadow:inset 0 -8px 0 0 rgba(0,0,0,.2),
+        1px 1px 0 0 #186fd3,
+        2px 2px 0 0 #186fd3,
+        3px 3px 0 0 #186fd3,
+        4px 4px 0 0 #186fd3,
+        5px 5px 0 0 #186fd3,
+        6px 6px 0 0 #186fd3,
+        7px 7px 0 0 #186fd3,
+        8px 8px 0 0 #186fd3,
+        9px 9px 0 0 #186fd3,
+        10px 10px 0 0 #186fd3,
+        11px 11px 0 0 #186fd3,
+        12px 12px 0 0 #186fd3;
+}
+
+.options-input {
+    width: 80%;
+}
+
+.question-splitted-input {
+    width: 45%;
+}
+
+.submit-answer-button {
+    margin-top: 50px;
+    height: 100px;
+}

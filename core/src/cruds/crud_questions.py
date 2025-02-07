@@ -109,7 +109,7 @@ def create_history_entry(repo: DatabaseRepository, user_id: int, user_answer: Us
             formatted_correct_answer = answer.answer_text.strip().lower()
             is_correct = (formatted_correct_answer == formatted_user_answer)
     elif question.type == QuestionType.CHECKBOX or question.type == QuestionType.RADIO:
-        correct_answers = repo.filter(and_(AnswersMultipleOptions.question_id == question.id, AnswersMultipleOptions.is_correct == True), model=AnswersMultipleOptions).all()
+        correct_answers = repo.filter(and_(AnswersMultipleOptions.question_id == question.id, AnswersMultipleOptions.is_correct == True), model=AnswersMultipleOptions)
         correct_answers = [correct_answer.option_text for correct_answer in correct_answers]
         if len(user_answer.users_answer) == len(correct_answers):
             is_correct = True

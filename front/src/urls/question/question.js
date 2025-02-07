@@ -32,7 +32,15 @@ class Question extends React.Component {
     componentDidMount() {
         const token = localStorage.getItem('token');
 
+        const queryParameters = new URLSearchParams(window.location.search)
+        const id = queryParameters.get("id")
+
         let url = 'http://localhost:8000/questions/';
+
+        if (id !== null) {
+            url = 'http://localhost:8000/questions/by-id?question_id=' + id;
+        }
+
         axios.get(url, {
             headers: {
                 Authorization: 'Bearer ' + token
@@ -72,7 +80,7 @@ class Question extends React.Component {
         e.preventDefault();
         const token = localStorage.getItem('token');
 
-        let url = 'http://localhost:8000/questions/';
+        let url = 'http://localhost:8000/questions/submit-answer';
         axios.post(url, {
             'user_id': 1,
             'question_id': this.state.question_id,
@@ -218,6 +226,7 @@ class Question extends React.Component {
                         <a href='/' className='header-href'>Меню</a>
                         <a href='/question' className='header-href'>Вопросы</a>
                         <a href='/leaderboard' className='header-href'>Лидерборд</a>
+                        <a href='/create/question' className='header-href'>Создать</a>
                         <a href='/profile' className='header-href'>{this.state.name}</a>
                     </div>
                     <div className='question-main'>

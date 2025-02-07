@@ -8,6 +8,7 @@ import Register from './urls/register/register.js';
 import Question from './urls/question/question.js';
 import Profile from './urls/profile/profile.js';
 import Leaderboard from './urls/leaderboard/leaderboard.js';
+import CreateQuestion from './urls/create/question/create_question.js';
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import reportWebVitals from './reportWebVitals';
 
@@ -23,6 +24,7 @@ root.render(
             <Route path='/question' element={<Question />} />
             <Route path='/profile' element={<Profile />} />
             <Route path='/leaderboard' element={<Leaderboard />} />
+            <Route path='/create/question' element={<CreateQuestion />} />
         </Routes>
     </BrowserRouter>
   </>

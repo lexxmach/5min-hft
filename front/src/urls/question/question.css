@@ -1,4 +1,5 @@
 .question-main {
+    margin: auto;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -68,7 +69,8 @@
 }
 
 .header {
-    width: 100%;
+    margin: auto;
+    width: 800px;
     display: flex;
     justify-content: space-between;
 }
