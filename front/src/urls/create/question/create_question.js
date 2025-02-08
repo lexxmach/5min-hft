@@ -35,7 +35,7 @@ class CreateQuestion extends React.Component {
     componentDidMount() {
         const token = localStorage.getItem('token');
 
-        let url = 'http://localhost:8000/is_root';
+        let url = process.env.REACT_APP_BACK_URL + 'is_root';
         axios.get(url, {
             headers: {
                 Authorization: 'Bearer ' + token
@@ -44,7 +44,7 @@ class CreateQuestion extends React.Component {
             this.setState({is_root: res.data});
         });
 
-        url = 'http://localhost:8000/info/';
+        url = process.env.REACT_APP_BACK_URL + 'info/';
         axios.get(url, {
             headers: {
                 Authorization: 'Bearer ' + token
@@ -154,7 +154,7 @@ class CreateQuestion extends React.Component {
     submitQuestion() {
         const token = localStorage.getItem('token');
 
-        let url = 'http://localhost:8000/questions/new';
+        let url = process.env.REACT_APP_BACK_URL + 'questions/new';
         let answer = null
         let options = null
         if (this.state.type === 'TEXT') {
@@ -184,7 +184,7 @@ class CreateQuestion extends React.Component {
     submitForm() {
         const token = localStorage.getItem('token');
 
-        let url = 'http://localhost:8000/admin/request-access';
+        let url = process.env.REACT_APP_BACK_URL + 'admin/request-access';
         axios.post(url, {}, {
             headers: {
                 Authorization: 'Bearer ' + token

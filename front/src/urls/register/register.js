@@ -30,7 +30,7 @@ class Register extends React.Component {
     handleSubmit(e) {
         e.preventDefault()
 
-        let url = 'http://localhost:8000/register';
+        let url = process.env.REACT_APP_BACK_URL + 'register';
         axios.post(url, {
             'user_credentials': {
                 'login': this.state.login,

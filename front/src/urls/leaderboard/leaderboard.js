@@ -16,7 +16,7 @@ class Leaderboard extends React.Component {
     componentDidMount() {
         const token = localStorage.getItem('token');
 
-        let url = 'http://localhost:8000/info/';
+        let url = process.env.REACT_APP_BACK_URL + '/info/';
         axios.get(url, {
             headers: {
                 Authorization: 'Bearer ' + token
@@ -29,7 +29,7 @@ class Leaderboard extends React.Component {
             })
         });
 
-        url = 'http://localhost:8000/leaderboard/';
+        url = process.env.REACT_APP_BACK_URL + 'leaderboard/';
         axios.get(url, {
             headers: {
                 Authorization: 'Bearer ' + token

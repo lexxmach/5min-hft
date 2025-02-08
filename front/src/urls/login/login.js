@@ -26,7 +26,7 @@ class Login extends React.Component {
     handleSubmit(e) {
         e.preventDefault()
 
-        let url = 'http://localhost:8000/token';
+        let url = process.env.REACT_APP_BACK_URL + 'token';
         axios.post(
             url, {
                 'login': this.state.login,

@@ -1,3 +1,4 @@
 core/src/.env
 ./configs/
 __pycache__/
+front/.env

@@ -35,10 +35,10 @@ class Question extends React.Component {
         const queryParameters = new URLSearchParams(window.location.search)
         const id = queryParameters.get("id")
 
-        let url = 'http://localhost:8000/questions/';
+        let url = process.env.REACT_APP_BACK_URL + 'questions/';
 
         if (id !== null) {
-            url = 'http://localhost:8000/questions/by-id?question_id=' + id;
+            url = process.env.REACT_APP_BACK_URL + 'questions/by-id?question_id=' + id;
         }
 
         axios.get(url, {
@@ -62,7 +62,7 @@ class Question extends React.Component {
             })
         });
 
-        url = 'http://localhost:8000/info/';
+        url = process.env.REACT_APP_BACK_URL + 'info/';
         axios.get(url, {
             headers: {
                 Authorization: 'Bearer ' + token
@@ -80,7 +80,7 @@ class Question extends React.Component {
         e.preventDefault();
         const token = localStorage.getItem('token');
 
-        let url = 'http://localhost:8000/questions/submit-answer';
+        let url = process.env.REACT_APP_BACK_URL + 'questions/submit-answer';
         axios.post(url, {
             'user_id': 1,
             'question_id': this.state.question_id,
