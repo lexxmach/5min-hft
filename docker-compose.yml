@@ -1,3 +1,5 @@
+version: '3'
+
 services:
   # Databases:
   postgresql:
@@ -33,7 +35,6 @@ services:
     depends_on:
       postgresql:
         condition: service_healthy
-        restart: true
 
 networks:
   hft-5min:

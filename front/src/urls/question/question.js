@@ -191,7 +191,7 @@ class Question extends React.Component {
                     <div className='wide-element'>
                         <span className='right-answer'>Ответ правильный</span>
                     </div>
-                    <form action="http://localhost:3000/question">
+                    <form action="/question">
                         <button className='question-button'>Далее</button>
                     </form>
                 </>
@@ -210,7 +210,7 @@ class Question extends React.Component {
                     <div className='wide-element'>
                         <span>Подсказка: {this.state.hint}</span>
                     </div>
-                    <form action="http://localhost:3000/question">
+                    <form action="/question">
                         <button className='question-button'>Далее</button>
                     </form>
                 </>

@@ -12,10 +12,10 @@ class Main extends React.Component {
                     <h1 className='name'>HFT in 5 minutes</h1>
                 </div>
                 <span>Погрузитесь в мир IT вместе с нами! Для начала работы войдите или зарегистрируйтесь по кнопкам ниже.</span>
-                <form action="http://localhost:3000/login">
+                <form action="/login">
                     <button className='green-button'>Войти</button>
                 </form>
-                <form action="http://localhost:3000/register">
+                <form action="/register">
                     <button className='blue-button'>Зарегистрироваться</button>
                 </form>
             </div>
