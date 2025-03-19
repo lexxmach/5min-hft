@@ -5,7 +5,7 @@ from models.enums import QuestionType
 from sqlalchemy import and_, func
 
 from models.schemas import SubmitNewQuestion, UserAnswer, QuestionRequest
-from models.models import Answers, AnswersMultipleOptions, History, Questions
+from models.models import Answers, AnswersMultipleOptions, History, Questions, QuestionsInRoom
 
 import random
 
@@ -65,6 +65,10 @@ def get_question_by_parameters(repo: DatabaseRepository, user_id: int, request: 
         subquery = repo.session.query(History.question_id).filter(and_(History.user_id == user_id, History.correctly_answered == True)).subquery()
         
         filters = [~Questions.id.in_(subquery)]
+        if request.room_id is not None:
+            room_subquery = repo.session.query(QuestionsInRoom.question_id).filter(QuestionsInRoom.room_id == request.room_id).subquery()
+            filters.append(Questions.id.in_(room_subquery))
+            
         if request.type is not None:
             filters.append(Questions.type == request.type)
         if request.difficulty is not None:
