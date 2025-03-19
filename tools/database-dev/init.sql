@@ -57,6 +57,19 @@ CREATE TABLE History (
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Create Rooms Table
+CREATE TABLE Rooms (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR NOT NULL,
+    owner_id INT REFERENCES UserData(id) ON DELETE CASCADE
+);
+
+-- Create Rooms Table
+CREATE TABLE QuestionsInRoom (
+    question_id INT REFERENCES Questions(id) ON DELETE CASCADE,
+    room_id INT REFERENCES Rooms(id) ON DELETE CASCADE
+);
+
 -- TEST DATA DELETE
 INSERT INTO questions (text, type, difficulty, category, hint) VALUES
 ('За сколько работает алгоритм сортировки пузырьком?', 'RADIO', 1, 'Программирование', 'Каждый проход цикла делает n - i действий, всего действий n.'),

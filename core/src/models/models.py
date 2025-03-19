@@ -70,3 +70,24 @@ class History(Base):
 
     userdata = relationship('UserData', back_populates='history')
     question = relationship('Questions', back_populates='history')
+
+
+class Rooms(Base):
+    __tablename__ = "rooms"
+    
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String, nullable=False)
+    owner_id = Column(Integer, ForeignKey("userdata.id", ondelete="CASCADE"))
+    
+    owner = relationship("UserData")
+    questions = relationship("QuestionsInRoom", back_populates="rooms")
+
+
+class QuestionsInRoom(Base):
+    __tablename__ = "questionsinroom"
+    
+    question_id = Column(Integer, ForeignKey("questions.id", ondelete="CASCADE"), primary_key=True)
+    room_id = Column(Integer, ForeignKey("rooms.id", ondelete="CASCADE"), primary_key=True)
+    
+    rooms = relationship("Rooms", back_populates="questions")
+    question = relationship("Questions")

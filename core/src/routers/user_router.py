@@ -24,24 +24,25 @@ def new_user(user_credentials: UserRegister, user_info: UserModel, repo: Databas
     return {}
 
 
-# @router.post("/token", response_model=Token)
-# def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], repo: DatabaseRepository = Depends(get_repo)):
-#     username, password = form_data.username, form_data.password
-#     db_credentials = crud_credentials.get_credentials_id_by_login(repo, username)
-
-#     if db_credentials is None:
-#         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, 
-#                             detail='Incorrect username')
-
-#     if not security.authenticate_user(db_credentials, password):
-#         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, 
-#                             detail='Incorrect password',
-#                             headers={"WWW-Authenticate": "Bearer"})
-    
-#     access_token = security.create_access_token(data={"sub": username})
-#     return Token(access_token=access_token, token_type="bearer")
-
 @router.post("/token", response_model=Token)
+def token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], repo: DatabaseRepository = Depends(get_repo)):
+    username, password = form_data.username, form_data.password
+    db_credentials = crud_credentials.get_credentials_id_by_login(repo, username)
+
+    if db_credentials is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, 
+                            detail='Incorrect username')
+
+    if not security.authenticate_user(db_credentials, password):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, 
+                            detail='Incorrect password',
+                            headers={"WWW-Authenticate": "Bearer"})
+    
+    access_token = security.create_access_token(data={"sub": username})
+    return Token(access_token=access_token, token_type="bearer")
+
+
+@router.post("/login", response_model=Token)
 def login(credentials: CredentialsAccept, repo: DatabaseRepository = Depends(get_repo)):
     db_credentials = crud_credentials.get_credentials_id_by_login(repo, credentials.login)
 

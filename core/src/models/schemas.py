@@ -49,6 +49,7 @@ class QuestionRequest(BaseModel):
     type: Union[QuestionType, None]
     difficulty: Union[int, None]
     category: Union[str, None]
+    room_id: Union[str, None]
 
 class SubmitAnswerResponse(BaseModel):
     is_answer_correct: bool
@@ -89,3 +90,14 @@ class SubmitNewQuestion(BaseModel):
 
     answer: Optional[AnswerBase] = None
     answers_multiple_options: Optional[list[AnswerMultipleOptionsBase]] = None
+
+class RoomCreate(BaseModel):
+    name: str
+
+class RoomResponse(BaseModel):
+    id: int
+    name: str
+    owner_id: int
+
+class QuestionsToRoomAdd(BaseModel):
+    question_ids: list[int]
