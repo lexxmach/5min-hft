@@ -44,7 +44,6 @@ async def approve_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def start_bot():
-    return
     try:
         application = Application.builder().token(TELEGRAM_TOKEN).build()
         application.add_handler(CommandHandler("start", start_command))
