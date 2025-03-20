@@ -2,10 +2,11 @@ from datetime import datetime
 from typing import Optional
 from pydantic import ValidationError
 from common.repo.repository import DatabaseRepository
+from cruds import crud_rooms
 from models.enums import QuestionType
 from sqlalchemy import and_, func
 
-from models.schemas import SubmitNewQuestion, UserAnswer, QuestionRequest
+from models.schemas import QuestionsToRoomAdd, SubmitNewQuestion, UserAnswer, QuestionRequest
 from models.models import Answers, AnswersMultipleOptions, History, Questions, QuestionsInRoom
 
 import random
@@ -31,6 +32,9 @@ def create_question(repo: DatabaseRepository, new_question: SubmitNewQuestion) -
                 db_options.append(db_option)
     except ValidationError:
         return None
+    
+    if new_question.room_id is not None:
+        crud_rooms.add_questions_to_room(repo, QuestionsToRoomAdd(question_ids=[db_question.id]), new_question.room_id)
     
     if db_answer:
         repo.create(db_answer, model=Answers)
