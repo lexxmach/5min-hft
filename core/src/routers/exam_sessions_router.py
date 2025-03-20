@@ -3,8 +3,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import RedirectResponse
 from dependencies import get_repo
 from common.repo.repository import DatabaseRepository
-from cruds import crud_exam_sessions, crud_rooms
-from models.schemas import ExamSessionResponse, QuestionStatusInSessionResult, SessionResult, UserAnswer
+from cruds import crud_exam_sessions, crud_rooms, crud_questions
+from models.schemas import ExamSessionResponse, QuestionStatusInSessionResult, SessionResult, SubmitAnswerResponse, UserAnswer
 
 router = APIRouter(prefix="/exam_sessions", tags=["exam sessions"])
 
@@ -43,10 +43,25 @@ def get_question(repo: DatabaseRepository = Depends(get_repo), current_user_id: 
     return RedirectResponse(f"/questions/?room_id={session.room_id}")
 
 
-@router.post("/submit-answer/{session_id}", status_code=status.HTTP_201_CREATED)
+@router.post("/submit-answer/{session_id}", status_code=status.HTTP_201_CREATED, response_model=SubmitAnswerResponse)
 def submit_answer(user_answer: UserAnswer, session_id: int, repo: DatabaseRepository = Depends(get_repo), current_user_id: int = Depends(security.get_current_user_id)):
-    return {"message: to be done!"}
+    session = crud_exam_sessions.get_active_session(repo, current_user_id)
+    if session is None or session.id != session_id:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No active exam session found: check the session id.")
+    time_left = crud_exam_sessions.get_time_left(repo, session.id)
+    if time_left == 0:
+        crud_exam_sessions.mark_session_completed(repo, session.id)
+        return RedirectResponse(f"/exam_sessions/results/{session.id}")
+    
+    history_entry = crud_questions.create_history_entry(repo, current_user_id, user_answer, session_id)
+    question, correct_answers, answers = crud_questions.get_question_by_id(repo, user_answer.question_id)
+    
+    if history_entry is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Something went wrong with submitting the answer")
 
+    return SubmitAnswerResponse(is_answer_correct=history_entry.correctly_answered, 
+                                hint=question.hint,
+                                correct_answers=correct_answers)
 
 @router.get("/timer_left")
 def timer_left(repo: DatabaseRepository = Depends(get_repo), current_user_id: int = Depends(security.get_current_user_id)):
