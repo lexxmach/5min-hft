@@ -28,8 +28,8 @@ def add_questions_to_room(repo: DatabaseRepository, new_questions: QuestionsToRo
     return 
 
 
-def get_rooms(repo: DatabaseRepository) -> List[Rooms]:
-    return repo.filter(model=Rooms)
+def get_rooms_by_owner_id(repo: DatabaseRepository, user_id: int) -> List[Rooms]:
+    return repo.filter(Rooms.owner_id == user_id, model=Rooms)
 
 
 def get_room_by_id(repo: DatabaseRepository, room_id: int) -> Rooms:

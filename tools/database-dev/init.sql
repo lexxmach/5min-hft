@@ -47,16 +47,6 @@ CREATE TABLE Credentials (
     password_hash VARCHAR NOT NULL
 );
 
--- Create History Table
-CREATE TABLE History (
-    id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES UserData(id) ON DELETE CASCADE,
-    question_id INT REFERENCES Questions(id) ON DELETE CASCADE,
-    users_answer VARCHAR,
-    correctly_answered BOOLEAN,
-    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
 -- Create Rooms Table
 CREATE TABLE Rooms (
     id SERIAL PRIMARY KEY,
@@ -69,6 +59,28 @@ CREATE TABLE QuestionsInRoom (
     question_id INT REFERENCES Questions(id) ON DELETE CASCADE,
     room_id INT REFERENCES Rooms(id) ON DELETE CASCADE
 );
+
+-- Create Exam session Table
+CREATE TABLE ExamSessions (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES userdata(id) ON DELETE CASCADE,
+    room_id INTEGER NOT NULL REFERENCES rooms(id) ON DELETE CASCADE,
+    start_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    duration INTERVAL NOT NULL,
+    completed BOOLEAN DEFAULT FALSE NOT NULL
+);
+
+-- Create History Table
+CREATE TABLE History (
+    id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES UserData(id) ON DELETE CASCADE,
+    question_id INT REFERENCES Questions(id) ON DELETE CASCADE,
+    users_answer VARCHAR,
+    correctly_answered BOOLEAN,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    session_id INT REFERENCES ExamSessions(id) on DELETE CASCADE
+);
+
 
 -- TEST DATA DELETE
 INSERT INTO questions (text, type, difficulty, category, hint) VALUES
