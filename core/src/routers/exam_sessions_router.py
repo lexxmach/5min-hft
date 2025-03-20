@@ -9,7 +9,7 @@ from models.schemas import ExamSessionResponse, QuestionStatusInSessionResult, S
 router = APIRouter(prefix="/exam_sessions", tags=["exam sessions"])
 
 
-@router.post("/start/{rood_id}", response_model=ExamSessionResponse)
+@router.post("/start/{room_id}", response_model=ExamSessionResponse)
 def start_exam(room_id: int, duration_seconds: int = 10 * 60, repo: DatabaseRepository = Depends(get_repo), current_user_id: int = Depends(security.get_current_user_id)):
     room = crud_rooms.get_room_by_id(repo, room_id)
     if room is None:
