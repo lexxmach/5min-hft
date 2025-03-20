@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 from pydantic import ValidationError
 from common.repo.repository import DatabaseRepository
 from models.enums import QuestionType
@@ -99,7 +100,7 @@ def get_question_by_parameters(repo: DatabaseRepository, user_id: int, request: 
         return question, answer_options
     
 
-def create_history_entry(repo: DatabaseRepository, user_id: int, user_answer: UserAnswer) -> History:
+def create_history_entry(repo: DatabaseRepository, user_id: int, user_answer: UserAnswer, session_id: int = None) -> Optional[History]:
     question = repo.filter(Questions.id == user_answer.question_id, model=Questions)
     if not question:
        return None
@@ -121,14 +122,15 @@ def create_history_entry(repo: DatabaseRepository, user_id: int, user_answer: Us
                 if given_answer != correct_answer:
                     is_correct = False
     else:
-        return None, None
+        return None
     
     history_entry = {
         "user_id": user_id,
         "question_id": question.id,
         "users_answer": " ".join(user_answer.users_answer),
         "correctly_answered": is_correct,
-        "timestamp": datetime.now()
+        "timestamp": datetime.now(),
+        "session_id": session_id
         }
     
     return repo.create(history_entry, model=History)
