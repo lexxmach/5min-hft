@@ -1,7 +1,8 @@
+import datetime
 from typing import Optional, Union
 from pydantic import BaseModel, Field
 
-from models.enums import QuestionType
+from models.enums import QuestionStatusType, QuestionType
 
 
 class UserRegister(BaseModel):
@@ -99,5 +100,22 @@ class RoomResponse(BaseModel):
     name: str
     owner_id: int
 
+
 class QuestionsToRoomAdd(BaseModel):
     question_ids: list[int]
+
+
+class ExamSessionResponse(BaseModel):
+    session_id: int
+    user_id: int
+    room_id: int
+    start_time: datetime.datetime
+    duration: datetime.timedelta
+
+
+class QuestionStatusInSessionResult(BaseModel):
+    question_id: int
+    question_status: QuestionStatusType
+
+class SessionResult(BaseModel):
+    questions: list[QuestionStatusInSessionResult]

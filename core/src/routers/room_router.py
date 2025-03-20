@@ -7,7 +7,7 @@ from typing import List
 from dependencies import get_repo
 
 
-router = APIRouter(prefix="/rooms", tags=["Rooms"])
+router = APIRouter(prefix="/rooms", tags=["rooms"])
 
 @router.post("/", response_model=int)
 def create_room(room_info: RoomCreate, repo: DatabaseRepository = Depends(get_repo), current_user_id: int = Depends(security.get_current_user_id)):
@@ -17,8 +17,8 @@ def create_room(room_info: RoomCreate, repo: DatabaseRepository = Depends(get_re
 
 
 @router.get("/", response_model=List[RoomResponse])
-def get_rooms(repo: DatabaseRepository = Depends(get_repo)):
-    rooms = crud_rooms.get_rooms(repo)
+def get_rooms(repo: DatabaseRepository = Depends(get_repo), current_user_id: int = Depends(security.get_current_user_id)):
+    rooms = crud_rooms.get_rooms_by_owner_id(repo, current_user_id)
     return [RoomResponse(id=room.id, name=room.name, owner_id=room.owner_id) for room in rooms]
 
 

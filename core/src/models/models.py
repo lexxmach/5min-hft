@@ -1,7 +1,9 @@
 from models.enums import QuestionType
-from sqlalchemy import Column, ForeignKey, Integer, String, Enum, Boolean, TIMESTAMP
+from sqlalchemy import Column, ForeignKey, Integer, String, Enum, Boolean, TIMESTAMP, Interval
 from sqlalchemy.orm import relationship
 from .database import Base
+from datetime import datetime
+
 
 class Questions(Base):
     __tablename__ = 'questions'
@@ -67,9 +69,11 @@ class History(Base):
     users_answer = Column(String)
     correctly_answered = Column(Boolean)
     timestamp = Column(TIMESTAMP, default='CURRENT_TIMESTAMP')
+    session_id = Column(Integer, ForeignKey('examsessions.id', ondelete='CASCADE'))
 
     userdata = relationship('UserData', back_populates='history')
     question = relationship('Questions', back_populates='history')
+    examsessions = relationship('ExamSession', back_populates='history')
 
 
 class Rooms(Base):
@@ -91,3 +95,18 @@ class QuestionsInRoom(Base):
     
     rooms = relationship("Rooms", back_populates="questions")
     question = relationship("Questions")
+
+
+class ExamSession(Base):
+    __tablename__ = "examsessions"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey("userdata.id", ondelete="CASCADE"), nullable=False)
+    room_id = Column(Integer, ForeignKey("rooms.id", ondelete="CASCADE"), nullable=False)
+    start_time = Column(TIMESTAMP, default=datetime.now, nullable=False)
+    duration = Column(Interval, nullable=False)
+    completed = Column(Boolean, default=False, nullable=False)
+
+    userdata = relationship("UserData")
+    rooms = relationship("Rooms")
+    history = relationship('History', back_populates='examsessions', cascade='all, delete')
