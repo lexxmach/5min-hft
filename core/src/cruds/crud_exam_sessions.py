@@ -45,9 +45,9 @@ def get_session_by_id(repo: DatabaseRepository, session_id: int) -> Optional[Exa
 
     return session[0]
 
-def get_session_by_room_id(repo: DatabaseRepository, room_id: int) -> Optional[ExamSession]:
-    session = repo.filter(
-        ExamSession.room_id == room_id,
+def get_session_by_room_id(repo: DatabaseRepository, room_id: int, user_id: int) -> Optional[ExamSession]:
+    session = repo.filter(and_(ExamSession.user_id == user_id, 
+                               ExamSession.room_id == room_id),
         model=ExamSession,
     )
 
@@ -55,6 +55,15 @@ def get_session_by_room_id(repo: DatabaseRepository, room_id: int) -> Optional[E
         return None
 
     return session[0]
+
+def get_all_sessions_by_room_id(repo: DatabaseRepository, room_id: int) -> Optional[list[ExamSession]]:
+    sessions = repo.filter(ExamSession.room_id == room_id,
+        model=ExamSession)
+
+    if not sessions:
+        return None
+
+    return sessions
 
 def mark_session_completed(repo: DatabaseRepository, session_id: int) -> bool:
     session = get_session_by_id(repo, session_id)

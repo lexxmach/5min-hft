@@ -124,6 +124,7 @@ class ExamSessionResponse(BaseModel):
 class QuestionStatusInSessionResult(BaseModel):
     question_id: int
     question_status: QuestionStatusType
+    user_id: int
 
 class SessionResult(BaseModel):
     questions: list[QuestionStatusInSessionResult]

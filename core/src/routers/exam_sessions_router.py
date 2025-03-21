@@ -19,7 +19,7 @@ def start_exam(room_id: int, repo: DatabaseRepository = Depends(get_repo), curre
     session = crud_exam_sessions.get_active_session(repo, current_user_id)
     if session is not None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Активная экзаменационная сессия в данной комнате уже существует. Пожалуйста, завершите текущий экзамен перед началом нового.")   
-    session = crud_exam_sessions.get_session_by_room_id(repo, room_id)
+    session = crud_exam_sessions.get_session_by_room_id(repo, room_id, current_user_id)
     if session is not None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Вы уже проходили этот экзамен. Каждый экзамен можно пройти только один раз. Пожалуйста, выберите другую комнату.")   
     
@@ -38,7 +38,7 @@ def start_exam(room_id: int, repo: DatabaseRepository = Depends(get_repo), curre
 
 @router.get("/question/{room_id}")
 def get_question(room_id: int, repo: DatabaseRepository = Depends(get_repo), current_user_id: int = Depends(security.get_current_user_id)):
-    session = crud_exam_sessions.get_session_by_room_id(repo, room_id)
+    session = crud_exam_sessions.get_session_by_room_id(repo, room_id, current_user_id)
     if session is None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Не найдена экзаменационная сессия для данной комнаты.")
     if session.completed is True:
@@ -68,7 +68,7 @@ def get_question(room_id: int, repo: DatabaseRepository = Depends(get_repo), cur
 
 @router.post("/submit-answer/{room_id}", status_code=status.HTTP_201_CREATED, response_model=SubmitAnswerResponse)
 def submit_answer(room_id: int, user_answer: UserAnswer, repo: DatabaseRepository = Depends(get_repo), current_user_id: int = Depends(security.get_current_user_id)):
-    session = crud_exam_sessions.get_session_by_room_id(repo, room_id)
+    session = crud_exam_sessions.get_session_by_room_id(repo, room_id, current_user_id)
     if session is None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Не найдена экзаменационная сессия для данной комнаты. ")
     if session.completed is True:
@@ -98,13 +98,17 @@ def timer_left(room_id: int, repo: DatabaseRepository = Depends(get_repo), curre
     session = crud_exam_sessions.get_active_session(repo, current_user_id)
     if session is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Не найдено активной экзаменационной сессии для залогиненного пользователя.")
+    
+    room = crud_rooms.get_room_by_id(repo, session.room_id)
+    if room is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Комната не найдена. Пожалуйста, проверьте ID комнаты и попробуйте снова.")
 
-    return {"time_left": crud_exam_sessions.get_time_left(repo, session.id)}
+    return {"time_left": crud_exam_sessions.get_time_left(repo, session.id, room.duration)}
 
 
 @router.get("/results/{room_id}", response_model=SessionResult)
 def get_exam_results(room_id: int, repo: DatabaseRepository = Depends(get_repo), current_user_id: int = Depends(security.get_current_user_id)):
-    session = crud_exam_sessions.get_session_by_room_id(repo, room_id)
+    session = crud_exam_sessions.get_session_by_room_id(repo, room_id, current_user_id)
     if session is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Не найдена экзаменационная сессия для данной комнаты.")
     if not session.completed:
@@ -115,12 +119,12 @@ def get_exam_results(room_id: int, repo: DatabaseRepository = Depends(get_repo),
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Не найдена экзаменационная сессия для данной комнаты.")
     questions, statuses = results
     
-    return SessionResult(questions=[QuestionStatusInSessionResult(question_id=question.id, question_status=q_status) for question, q_status in zip(questions, statuses)])
+    return SessionResult(questions=[QuestionStatusInSessionResult(user_id=current_user_id, question_id=question.id, question_status=q_status) for question, q_status in zip(questions, statuses)])
 
 
 @router.get("/complete/{room_id}")
 def manually_complete_session(room_id: int, repo: DatabaseRepository = Depends(get_repo), current_user_id: int = Depends(security.get_current_user_id)):
-    session = crud_exam_sessions.get_session_by_room_id(repo, room_id)
+    session = crud_exam_sessions.get_session_by_room_id(repo, room_id, current_user_id)
     if session is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Не найдена экзаменационная сессия для данной комнаты.")
     
@@ -128,3 +132,19 @@ def manually_complete_session(room_id: int, repo: DatabaseRepository = Depends(g
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Не найдена экзаменационная сессия для данной комнаты.")
     
     return {"message": "Session completed."}
+
+
+@router.get("/results/all/{room_id}", response_model=list[SessionResult])
+def get_all_exam_results(room_id: int, repo: DatabaseRepository = Depends(get_repo)):
+    sessions = crud_exam_sessions.get_all_sessions_by_room_id(repo, room_id)
+    if sessions is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Не найдена экзаменационная сессия для данной комнаты.")
+
+    results = []
+    for session in sessions:
+        result = crud_exam_sessions.get_results_for_session(repo, session.id)
+        if result is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Не выгрузились результаты. Попробуйте позже.")   
+        questions, statuses = result
+        results.append(SessionResult(questions=[QuestionStatusInSessionResult(user_id=session.user_id, question_id=question.id, question_status=q_status) for question, q_status in zip(questions, statuses)]))
+    return results
