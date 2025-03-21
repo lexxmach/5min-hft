@@ -19,7 +19,7 @@ def create_room(room_info: RoomCreate, repo: DatabaseRepository = Depends(get_re
 @router.get("/", response_model=List[RoomResponse])
 def get_rooms(repo: DatabaseRepository = Depends(get_repo), current_user_id: int = Depends(security.get_current_user_id)):
     rooms = crud_rooms.get_rooms_by_owner_id(repo, current_user_id)
-    return [RoomResponse(id=room.id, name=room.name, owner_id=room.owner_id, duration_seconds=room.duration, 
+    return [RoomResponse(id=room.id, name=room.name, owner_id=room.owner_id, duration=room.duration, 
                          min_start_time=room.min_start_time, max_start_time=room.max_start_time) for room in rooms]
 
 @router.get("/{room_id}", response_model=RoomResponse)
@@ -29,7 +29,7 @@ def get_room(room_id: int, repo: DatabaseRepository = Depends(get_repo)):
     if room is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Room not found")
     
-    return RoomResponse(id=room.id, name=room.name, owner_id=room.owner_id, duration_seconds=room.duration, 
+    return RoomResponse(id=room.id, name=room.name, owner_id=room.owner_id, duration=room.duration, 
                          min_start_time=room.min_start_time, max_start_time=room.max_start_time)
     
 @router.delete("/{room_id}")
