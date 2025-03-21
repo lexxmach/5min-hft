@@ -47,7 +47,7 @@ def get_question(room_id: int, repo: DatabaseRepository = Depends(get_repo), cur
 
     time_left = crud_exam_sessions.get_time_left(repo, session.id, room.duration)
     question, options = crud_questions.get_question_by_parameters(repo, current_user_id, QuestionRequest(room_id=session.room_id, session_id=session.id, type=None, difficulty=None, category=None))
-    if time_left == 0 or question is None:
+    if time_left == 0 or not question:
         crud_exam_sessions.mark_session_completed(repo, session.id)
         return RedirectResponse(f"/exam_sessions/results/{room_id}")
     

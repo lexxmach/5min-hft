@@ -6,6 +6,24 @@ BEGIN
     END IF;
 END $$;
 
+-- Create UserData Table
+CREATE TABLE UserData (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR NOT NULL,
+    surname VARCHAR NOT NULL,
+    is_root BOOLEAN NOT NULL
+);
+
+-- Create Rooms Table
+CREATE TABLE Rooms (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR NOT NULL,
+    owner_id INT REFERENCES UserData(id) ON DELETE CASCADE,
+    duration INTERVAL NOT NULL,
+    min_start_time TIMESTAMP NOT NULL,
+    max_start_time TIMESTAMP NOT NULL
+);
+
 -- Create Questions Table
 CREATE TABLE Questions (
     id SERIAL PRIMARY KEY,
@@ -13,7 +31,8 @@ CREATE TABLE Questions (
     type question_type NOT NULL,
     difficulty INT DEFAULT 1,
     category VARCHAR,
-    hint VARCHAR
+    hint VARCHAR, 
+    room_id INT REFERENCES Rooms(id) ON DELETE CASCADE
 );
 
 -- Create Answers Table (for TEXT, ORDER types)
@@ -31,30 +50,12 @@ CREATE TABLE AnswersMultipleOptions (
     is_correct BOOLEAN NOT NULL
 );
 
--- Create UserData Table
-CREATE TABLE UserData (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR NOT NULL,
-    surname VARCHAR NOT NULL,
-    is_root BOOLEAN NOT NULL
-);
-
 -- Create Credentials Table
 CREATE TABLE Credentials (
     id SERIAL PRIMARY KEY,
     user_id INT REFERENCES UserData(id) ON DELETE CASCADE,
     login VARCHAR NOT NULL,
     password_hash VARCHAR NOT NULL
-);
-
--- Create Rooms Table
-CREATE TABLE Rooms (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR NOT NULL,
-    owner_id INT REFERENCES UserData(id) ON DELETE CASCADE,
-    duration INTERVAL NOT NULL,
-    min_start_time TIMESTAMP NOT NULL,
-    max_start_time TIMESTAMP NOT NULL
 );
 
 -- Create Rooms Table
