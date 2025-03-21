@@ -182,7 +182,7 @@ class Room extends React.Component {
                                 <input type="datetime-local" />
                             </div>
                             <div className='room-form-splitter'>
-                                <span>Максмальное время начала</span>
+                                <span>Максимальное время начала</span>
                                 <input type="datetime-local" />
                             </div>
                             <button className='login-button'>Создать</button>
