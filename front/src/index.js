@@ -8,7 +8,11 @@ import Register from './urls/register/register.js';
 import Question from './urls/question/question.js';
 import Profile from './urls/profile/profile.js';
 import Leaderboard from './urls/leaderboard/leaderboard.js';
+import Room from './urls/room/room.js';
 import CreateQuestion from './urls/create/question/create_question.js';
+import ExamQuestion from './urls/exam_sessions/question/question.js'
+import Start from './urls/exam_sessions/start/start.js'
+import Results from './urls/exam_sessions/results/results.js'
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import reportWebVitals from './reportWebVitals';
 
@@ -24,7 +28,11 @@ root.render(
             <Route path='/question' element={<Question />} />
             <Route path='/profile' element={<Profile />} />
             <Route path='/leaderboard' element={<Leaderboard />} />
+            <Route path='/rooms' element={<Room />} />
             <Route path='/create/question' element={<CreateQuestion />} />
+            <Route path='/exam_sessions/question' element={<ExamQuestion />} />
+            <Route path='/exam_sessions/start' element={<Start />} />
+            <Route path='/exam_sessions/results' element={<Results />} />
         </Routes>
     </BrowserRouter>
   </>

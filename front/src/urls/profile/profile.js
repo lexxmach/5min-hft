@@ -68,6 +68,7 @@ class Profile extends React.Component {
                         <a href='/question' className='header-href'>Вопросы</a>
                         <a href='/leaderboard' className='header-href'>Лидерборд</a>
                         <a href='/create/question' className='header-href'>Создать</a>
+                        <a href='/rooms' className='header-href'>Комнаты</a>
                         <a href='/profile' className='header-href'>{this.state.name}</a>
                     </div>
                 <div className='profile-main'>

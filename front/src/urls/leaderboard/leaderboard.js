@@ -16,7 +16,7 @@ class Leaderboard extends React.Component {
     componentDidMount() {
         const token = localStorage.getItem('token');
 
-        let url = process.env.REACT_APP_BACK_URL + '/info/';
+        let url = process.env.REACT_APP_BACK_URL + 'info/';
         axios.get(url, {
             headers: {
                 Authorization: 'Bearer ' + token
@@ -79,12 +79,13 @@ class Leaderboard extends React.Component {
         return (
             <>
                 <div className='header'>
-                        <a href='/' className='header-href'>Меню</a>
-                        <a href='/question' className='header-href'>Вопросы</a>
-                        <a href='/leaderboard' className='header-href'>Лидерборд</a>
-                        <a href='/create/question' className='header-href'>Создать</a>
-                        <a href='/profile' className='header-href'>{this.state.name}</a>
-                    </div>
+                    <a href='/' className='header-href'>Меню</a>
+                    <a href='/question' className='header-href'>Вопросы</a>
+                    <a href='/leaderboard' className='header-href'>Лидерборд</a>
+                    <a href='/create/question' className='header-href'>Создать</a>
+                    <a href='/rooms' className='header-href'>Комнаты</a>
+                    <a href='/profile' className='header-href'>{this.state.name}</a>
+                </div>
                 <div className='leaderboar-main'>
                     <div className='wide-element'>
                         <h1 className='leaderboard-main-label'>Лидерборд</h1>

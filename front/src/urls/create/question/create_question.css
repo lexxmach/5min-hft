@@ -43,6 +43,14 @@
     width: 45%;
 }
 
+.question-room-input {
+    width: 30%;
+}
+
+.question-room-label {
+    margin: 0;
+}
+
 .submit-answer-button {
     margin-top: 50px;
     height: 100px;

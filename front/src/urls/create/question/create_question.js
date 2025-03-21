@@ -20,6 +20,7 @@ class CreateQuestion extends React.Component {
             inputs: [],
             redirect_to: -1,
             is_root: false,
+            room: '',
         };
 
         this.getCheckboxes = this.getCheckboxes.bind(this);
@@ -164,7 +165,7 @@ class CreateQuestion extends React.Component {
         } else {
             options = this.state.options
         }
-        axios.post(url, {
+        let body = {
             'question_text': this.state.question,
             'type': this.state.type,
             'difficulty': Number(this.state.difficulty),
@@ -172,7 +173,11 @@ class CreateQuestion extends React.Component {
             'hint': '',
             'answer': answer,
             'answers_multiple_options': options
-        }, {
+        }
+        if (this.state.room != '') {
+            body.room_id = this.state.room;
+        }
+        axios.post(url, body, {
             headers: {
                 Authorization: 'Bearer ' + token
             }
@@ -201,7 +206,6 @@ class CreateQuestion extends React.Component {
             )
         }
         if (this.state.redirect_to !== -1) {
-            console.log(this.state.redirect_to)
             return (
                 <Navigate to={'/question?id=' + this.state.redirect_to.toString()} />
             )
@@ -214,6 +218,7 @@ class CreateQuestion extends React.Component {
                         <a href='/question' className='header-href'>Вопросы</a>
                         <a href='/leaderboard' className='header-href'>Лидерборд</a>
                         <a href='/create/question' className='header-href'>Создать</a>
+                        <a href='/rooms' className='header-href'>Комнаты</a>
                         <a href='/profile' className='header-href'>{this.state.name}</a>
                     </div>
                     <div className='question-main'>
@@ -231,6 +236,7 @@ class CreateQuestion extends React.Component {
                     <a href='/question' className='header-href'>Вопросы</a>
                     <a href='/leaderboard' className='header-href'>Лидерборд</a>
                     <a href='/create/question' className='header-href'>Создать</a>
+                    <a href='/rooms' className='header-href'>Комнаты</a>
                     <a href='/profile' className='header-href'>{this.state.name}</a>
                 </div>
                 <div className='question-main'>
@@ -249,6 +255,12 @@ class CreateQuestion extends React.Component {
                         </div>
                     </div>
                     {this.getInput()}
+                    <div className='wide-element'>
+                        <div className='splitter'>
+                            <h1 className='question-room-label'>Номер комнаты:</h1>
+                            <input className='question-room-input' type='text' placeholder='Комната' onChange={event => this.setState({room: event.target.value})} />
+                        </div>
+                    </div>
                     <button className='submit-answer-button' onClick={this.submitQuestion}>Создать</button>
                 </div>
             </>
