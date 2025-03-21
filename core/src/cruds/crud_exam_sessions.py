@@ -56,7 +56,6 @@ def get_session_by_room_id(repo: DatabaseRepository, room_id: int) -> Optional[E
 
     return session[0]
 
-
 def mark_session_completed(repo: DatabaseRepository, session_id: int) -> bool:
     session = get_session_by_id(repo, session_id)
     if session is None:

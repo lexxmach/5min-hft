@@ -4,7 +4,7 @@ from fastapi.responses import RedirectResponse
 from dependencies import get_repo
 from common.repo.repository import DatabaseRepository
 from cruds import crud_exam_sessions, crud_rooms, crud_questions
-from models.schemas import ExamSessionResponse, QuestionStatusInSessionResult, SessionResult, SubmitAnswerResponse, UserAnswer
+from models.schemas import ExamSessionResponse, QuestionRequest, QuestionStatusInSessionResult, QuizQuestion, SessionResult, SubmitAnswerResponse, UserAnswer
 
 router = APIRouter(prefix="/exam_sessions", tags=["exam sessions"])
 
@@ -36,11 +36,21 @@ def get_question(repo: DatabaseRepository = Depends(get_repo), current_user_id: 
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No active exam session found.")
 
     time_left = crud_exam_sessions.get_time_left(repo, session.id)
-    if time_left == 0:
+    question, options = crud_questions.get_question_by_parameters(repo, current_user_id, QuestionRequest(room_id=session.room_id))
+    if time_left == 0 or question is None:
         crud_exam_sessions.mark_session_completed(repo, session.id)
         return RedirectResponse(f"/exam_sessions/results/{session.id}")
     
-    return RedirectResponse(f"/questions/?room_id={session.room_id}")
+    # return RedirectResponse(f"/questions/?room_id={session.room_id}")
+    return QuizQuestion(
+        id=question.id,
+        question=question.text,
+        type=question.type,
+        options=options,
+        difficulty=question.difficulty,
+        category=question.category,
+    )
+
 
 
 @router.post("/submit-answer/{room_id}", status_code=status.HTTP_201_CREATED, response_model=SubmitAnswerResponse)
