@@ -89,7 +89,7 @@ class SubmitNewQuestion(BaseModel):
     difficulty: int
     category: str
     hint: str
-    room_id: Union[str, None]
+    room_id: Union[int, None]
 
     answer: Optional[AnswerBase] = None
     answers_multiple_options: Optional[list[AnswerMultipleOptionsBase]] = None

@@ -19,6 +19,9 @@ def start_exam(room_id: int, repo: DatabaseRepository = Depends(get_repo), curre
     session = crud_exam_sessions.get_active_session(repo, current_user_id)
     if session is not None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="There is already an active session.")   
+    session = crud_exam_sessions.get_session_by_room_id(repo, room_id)
+    if session is not None:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="There has already been one session, assigned to this room.")   
     
     if datetime.now() > room.max_start_time:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Too late to start a session.") 
@@ -113,3 +116,15 @@ def get_exam_results(room_id: int, repo: DatabaseRepository = Depends(get_repo),
     questions, statuses = results
     
     return SessionResult(questions=[QuestionStatusInSessionResult(question_id=question.id, question_status=q_status) for question, q_status in zip(questions, statuses)])
+
+
+@router.get("/complete/{room_id}")
+def manually_complete_session(room_id: int, repo: DatabaseRepository = Depends(get_repo), current_user_id: int = Depends(security.get_current_user_id)):
+    session = crud_exam_sessions.get_session_by_room_id(repo, room_id)
+    if session is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No exam session found.")
+    
+    if not crud_exam_sessions.mark_session_completed(repo, session.id):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No exam session found.")
+    
+    return {"message": "Session completed."}
