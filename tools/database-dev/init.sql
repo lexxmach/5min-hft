@@ -51,7 +51,10 @@ CREATE TABLE Credentials (
 CREATE TABLE Rooms (
     id SERIAL PRIMARY KEY,
     name VARCHAR NOT NULL,
-    owner_id INT REFERENCES UserData(id) ON DELETE CASCADE
+    owner_id INT REFERENCES UserData(id) ON DELETE CASCADE,
+    duration INTERVAL NOT NULL,
+    min_start_time TIMESTAMP NOT NULL,
+    max_start_time TIMESTAMP NOT NULL
 );
 
 -- Create Rooms Table
@@ -66,7 +69,6 @@ CREATE TABLE ExamSessions (
     user_id INTEGER NOT NULL REFERENCES userdata(id) ON DELETE CASCADE,
     room_id INTEGER NOT NULL REFERENCES rooms(id) ON DELETE CASCADE,
     start_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    duration INTERVAL NOT NULL,
     completed BOOLEAN DEFAULT FALSE NOT NULL
 );
 

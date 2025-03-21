@@ -7,13 +7,12 @@ from pydantic import ValidationError
 from sqlalchemy import and_
 
 
-def create_exam_session(repo: DatabaseRepository, user_id: int, room_id: int, duration_seconds: int) -> Optional[ExamSession]:
+def create_exam_session(repo: DatabaseRepository, user_id: int, room_id: int) -> Optional[ExamSession]:
     try:
         db_session = {
             "user_id": user_id,
             "room_id": room_id,
             "start_time": datetime.now(),
-            "duration": timedelta(seconds=duration_seconds),
             "completed": False,
         }
     except ValidationError:
@@ -34,6 +33,7 @@ def get_active_session(repo: DatabaseRepository, user_id: int) -> Optional[ExamS
 
     return session[0]
 
+
 def get_session_by_id(repo: DatabaseRepository, session_id: int) -> Optional[ExamSession]:
     session = repo.filter(
         ExamSession.id == session_id,
@@ -51,7 +51,7 @@ def get_session_by_room_id(repo: DatabaseRepository, room_id: int) -> Optional[E
         model=ExamSession,
     )
 
-    if session is None:
+    if not session:
         return None
 
     return session[0]
@@ -65,12 +65,12 @@ def mark_session_completed(repo: DatabaseRepository, session_id: int) -> bool:
     return True
 
 
-def get_time_left(repo: DatabaseRepository, session_id: int) -> Optional[int]:
+def get_time_left(repo: DatabaseRepository, session_id: int, room_duration: timedelta) -> Optional[int]:
     session = get_session_by_id(repo, session_id)
     if session is None:
         return None
 
-    time_left = max(0, (session.start_time + session.duration - datetime.now()).total_seconds())
+    time_left = max(0, (session.start_time + room_duration - datetime.now()).total_seconds())
     return int(time_left)
 
 

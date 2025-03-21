@@ -1,3 +1,4 @@
+from datetime import timedelta
 from typing import List
 from pydantic import ValidationError
 from common.repo.repository import DatabaseRepository
@@ -8,7 +9,10 @@ from models.models import Rooms, QuestionsInRoom
 
 def create_room(repo: DatabaseRepository, room_info: RoomCreate, user_id: int) -> int:
     try:
-        db_room = {"name": room_info.name, "owner_id": user_id}
+        db_room = {"name": room_info.name, "owner_id": user_id, 
+            "duration": timedelta(seconds=room_info.duration_seconds),
+            "min_start_time": room_info.min_start_time, 
+            "max_start_time": room_info.max_start_time}
     except ValidationError:
         return None
     created_room = repo.create(db_room, model=Rooms)

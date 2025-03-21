@@ -72,6 +72,9 @@ def get_question_by_parameters(repo: DatabaseRepository, user_id: int, request: 
         filters = [~Questions.id.in_(subquery)]
         if request.room_id is not None:
             room_subquery = repo.session.query(QuestionsInRoom.question_id).filter(QuestionsInRoom.room_id == request.room_id).subquery()
+            if request.session_id is not None:
+                answered = repo.session.query(History.question_id).filter(and_(History.user_id == user_id, History.session_id == request.session_id)).subquery()
+                filters.append(~Questions.id.in_(answered))
             filters.append(Questions.id.in_(room_subquery))
             
         if request.type is not None:

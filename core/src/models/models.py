@@ -82,6 +82,9 @@ class Rooms(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, nullable=False)
     owner_id = Column(Integer, ForeignKey("userdata.id", ondelete="CASCADE"))
+    duration = Column(Interval, nullable=False)
+    min_start_time = Column(TIMESTAMP)
+    max_start_time = Column(TIMESTAMP)
     
     owner = relationship("UserData")
     questions = relationship("QuestionsInRoom", back_populates="rooms")
@@ -104,7 +107,6 @@ class ExamSession(Base):
     user_id = Column(Integer, ForeignKey("userdata.id", ondelete="CASCADE"), nullable=False)
     room_id = Column(Integer, ForeignKey("rooms.id", ondelete="CASCADE"), nullable=False)
     start_time = Column(TIMESTAMP, default=datetime.now, nullable=False)
-    duration = Column(Interval, nullable=False)
     completed = Column(Boolean, default=False, nullable=False)
 
     userdata = relationship("UserData")
