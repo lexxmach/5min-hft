@@ -50,7 +50,8 @@ class QuestionRequest(BaseModel):
     type: Union[QuestionType, None]
     difficulty: Union[int, None]
     category: Union[str, None]
-    room_id: Union[str, None]
+    room_id: Union[int, None]
+    session_id: Union[int, None]
 
 class SubmitAnswerResponse(BaseModel):
     is_answer_correct: bool
@@ -95,11 +96,17 @@ class SubmitNewQuestion(BaseModel):
 
 class RoomCreate(BaseModel):
     name: str
+    duration_seconds: int
+    min_start_time: datetime.datetime
+    max_start_time: datetime.datetime
 
 class RoomResponse(BaseModel):
     id: int
     name: str
     owner_id: int
+    duration: datetime.timedelta 
+    min_start_time: datetime.datetime
+    max_start_time: datetime.datetime
 
 
 class QuestionsToRoomAdd(BaseModel):
