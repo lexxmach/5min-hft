@@ -7,6 +7,7 @@ class Room extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            is_root: true,
             rooms: [],
             room_name: '',
         };
@@ -20,7 +21,16 @@ class Room extends React.Component {
     componentDidMount() {
         const token = localStorage.getItem('token');
 
-        let url = process.env.REACT_APP_BACK_URL + 'info/';
+        let url = process.env.REACT_APP_BACK_URL + 'is_root';
+        axios.get(url, {
+            headers: {
+                Authorization: 'Bearer ' + token
+            }
+        }).then(res => {
+            this.setState({is_root: res.data});
+        });
+
+        url = process.env.REACT_APP_BACK_URL + 'info/';
         axios.get(url, {
             headers: {
                 Authorization: 'Bearer ' + token
@@ -112,6 +122,25 @@ class Room extends React.Component {
     }
 
     render() {
+        if (!this.state.is_root) {
+            return (
+                <>
+                    <div className='header'>
+                        <a href='/' className='header-href'>Меню</a>
+                        <a href='/question' className='header-href'>Вопросы</a>
+                        <a href='/leaderboard' className='header-href'>Лидерборд</a>
+                        <a href='/create/question' className='header-href'>Создать</a>
+                        <a href='/rooms' className='header-href'>Комнаты</a>
+                        <a href='/profile' className='header-href'>{this.state.name}</a>
+                    </div>
+                    <div className='question-main'>
+                        <h1 className='question-label'>Доступ запрещён</h1>
+                        <span>У вас нет доступа до создания комнаты. Если вы хотите получить такую возможность, нажмите на кнопку ниже, тогда вашу заявку рассмотрит администратор.</span>
+                        <button className='submit-answer-button' onClick={this.submitForm}>Заказать доступ</button>
+                    </div>
+                </>
+            )
+        }
         return (
             <>
                 <div className='header'>
