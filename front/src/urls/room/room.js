@@ -84,9 +84,9 @@ class Room extends React.Component {
                         <span>id = {this.state.rooms[i].id}</span>
                     </div>
                     <div className='room-list-room-buttons'>
-                        <button className='room-button-blue' onClick={(e) => {e.preventDefault(); window.location.href='/create/question';}}>Добавить вопрос</button>
-                        <button className='room-button' onClick={() => {navigator.clipboard.writeText(process.env.REACT_APP_FRONT_URL + 'exam_sessions/start?room_id=' + this.state.rooms[i].id.toString())}}>Скопировать ссылку</button>
-                        <button className='room-button-blue' onClick={() => {this.onResults(this.state.rooms[i].id)}}>Результаты</button>
+                        <button className='room-button' onClick={(e) => {e.preventDefault(); window.location.href='/create/question';}}>Добавить вопрос</button>
+                        <button className='room-button-blue' onClick={() => {navigator.clipboard.writeText(process.env.REACT_APP_FRONT_URL + 'exam_sessions/start?room_id=' + this.state.rooms[i].id.toString())}}>Скопировать ссылку</button>
+                        <button className='room-button' onClick={() => {this.onResults(this.state.rooms[i].id)}}>Результаты</button>
                     </div>
                 </div>
             )
