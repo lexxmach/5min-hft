@@ -11,3 +11,4 @@ itsdangerous==2.1.2
 aiosmtplib==4.0.0
 python-telegram-bot==21.10
 requests==2.31.0
+pytz==2024.1

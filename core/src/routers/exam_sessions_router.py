@@ -6,6 +6,7 @@ from dependencies import get_repo
 from common.repo.repository import DatabaseRepository
 from cruds import crud_exam_sessions, crud_rooms, crud_questions
 from models.schemas import ExamSessionResponse, QuestionRequest, QuestionStatusInSessionResult, QuizQuestion, SessionResult, SubmitAnswerResponse, UserAnswer
+import pytz
 
 router = APIRouter(prefix="/exam_sessions", tags=["exam sessions"])
 
@@ -26,7 +27,8 @@ def start_exam(room_id: int, repo: DatabaseRepository = Depends(get_repo), curre
     if datetime.now() > room.max_start_time:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Время для начала экзамена истекло. Этот экзамен больше недоступен. Пожалуйста, обратитесь к преподавателю за дополнительной информацией.") 
     if datetime.now() < room.min_start_time:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Экзамен еще не начался. Пожалуйста, подождите до {room.min_start_time.strftime('%d.%m.%Y %H:%M')} чтобы начать этот экзамен.") 
+        room_min_time = room.min_start_time.astimezone(pytz.timezone("Europe/Moscow")).strftime('%d.%m.%Y %H:%M')
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Экзамен еще не начался. Пожалуйста, подождите до {room_min_time}, чтобы начать этот экзамен.")
     
     session = crud_exam_sessions.create_exam_session(repo, user_id=current_user_id, room_id=room_id)
     if session is None:
