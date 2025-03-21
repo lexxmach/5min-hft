@@ -15,7 +15,7 @@ def create_question(repo: DatabaseRepository, new_question: SubmitNewQuestion) -
     try:
         db_question = {"text": new_question.question_text, "type": new_question.type, 
                        "difficulty": new_question.difficulty, "category": new_question.category, 
-                       "hint": new_question.hint}
+                       "hint": new_question.hint, "room_id": new_question.room_id}
         db_question = repo.create(db_question, model=Questions)
         db_answer = None
         if new_question.answer:
@@ -76,6 +76,8 @@ def get_question_by_parameters(repo: DatabaseRepository, user_id: int, request: 
                 answered = repo.session.query(History.question_id).filter(and_(History.user_id == user_id, History.session_id == request.session_id)).subquery()
                 filters.append(~Questions.id.in_(answered))
             filters.append(Questions.id.in_(room_subquery))
+        else:
+            filters.append(Questions.room_id == None)
             
         if request.type is not None:
             filters.append(Questions.type == request.type)

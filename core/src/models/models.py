@@ -14,11 +14,12 @@ class Questions(Base):
     difficulty = Column(Integer, default=1)
     category = Column(String)
     hint = Column(String)
+    room_id = Column(Integer, ForeignKey("rooms.id", ondelete="CASCADE"))
 
     answers = relationship('Answers', back_populates='question', cascade='all, delete')
     answers_multiple_options = relationship('AnswersMultipleOptions', back_populates='question', cascade='all, delete')
     history = relationship('History', back_populates='question', cascade='all, delete')
-
+    rooms = relationship("Rooms")
 
 class Answers(Base):
     __tablename__ = 'answers'
@@ -88,6 +89,7 @@ class Rooms(Base):
     
     owner = relationship("UserData")
     questions = relationship("QuestionsInRoom", back_populates="rooms")
+    question = relationship('Questions', back_populates='rooms')
 
 
 class QuestionsInRoom(Base):
