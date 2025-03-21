@@ -14,19 +14,19 @@ router = APIRouter(prefix="/exam_sessions", tags=["exam sessions"])
 def start_exam(room_id: int, repo: DatabaseRepository = Depends(get_repo), current_user_id: int = Depends(security.get_current_user_id)):
     room = crud_rooms.get_room_by_id(repo, room_id)
     if room is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Комната не найдена.")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Комната не найдена. Пожалуйста, проверьте ID комнаты и попробуйте снова.")
 
     session = crud_exam_sessions.get_active_session(repo, current_user_id)
     if session is not None:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Активная экзаменационная сессия в данной комнате уже существует.")   
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Активная экзаменационная сессия в данной комнате уже существует. Пожалуйста, завершите текущий экзамен перед началом нового.")   
     session = crud_exam_sessions.get_session_by_room_id(repo, room_id)
     if session is not None:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Экзамен уже был пройден для данной комнаты.")   
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Вы уже проходили этот экзамен. Каждый экзамен можно пройти только один раз. Пожалуйста, выберите другую комнату.")   
     
     if datetime.now() > room.max_start_time:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Слишком поздно, чтобы начать экзаменационную сессию.") 
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Время для начала экзамена истекло. Этот экзамен больше недоступен. Пожалуйста, обратитесь к преподавателю за дополнительной информацией.") 
     if datetime.now() < room.min_start_time:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Слишком ранл, чтобы начать экзаменационную сессию.") 
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Экзамен еще не начался. Пожалуйста, подождите до {room.min_start_time.strftime('%d.%m.%Y %H:%M')} чтобы начать этот экзамен.") 
     
     session = crud_exam_sessions.create_exam_session(repo, user_id=current_user_id, room_id=room_id)
     if session is None:
@@ -46,7 +46,7 @@ def get_question(room_id: int, repo: DatabaseRepository = Depends(get_repo), cur
     
     room = crud_rooms.get_room_by_id(repo, room_id)
     if room is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Комната не найдена.")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Комната не найдена. Пожалуйста, проверьте ID комнаты и попробуйте снова.")
 
     time_left = crud_exam_sessions.get_time_left(repo, session.id, room.duration)
     question, options = crud_questions.get_question_by_parameters(repo, current_user_id, QuestionRequest(room_id=session.room_id, session_id=session.id, type=None, difficulty=None, category=None))
@@ -70,13 +70,13 @@ def get_question(room_id: int, repo: DatabaseRepository = Depends(get_repo), cur
 def submit_answer(room_id: int, user_answer: UserAnswer, repo: DatabaseRepository = Depends(get_repo), current_user_id: int = Depends(security.get_current_user_id)):
     session = crud_exam_sessions.get_session_by_room_id(repo, room_id)
     if session is None:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Не найдена экзаменационная сессия для данной комнаты.")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Не найдена экзаменационная сессия для данной комнаты. ")
     if session.completed is True:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Экзамен завершен, пожалуйста, перейдите /exam_sessions/results/, чтобы узнать результаты.")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Экзамен завершен. Пожалуйста, перейдите /exam_sessions/results/, чтобы узнать результаты.")
     
     room = crud_rooms.get_room_by_id(repo, session.room_id)
     if room is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Комната не найдена.")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Комната не найдена. Пожалуйста, проверьте ID комнаты и попробуйте снова.")
 
     time_left = crud_exam_sessions.get_time_left(repo, session.id, room.duration)
     if time_left == 0:
@@ -87,7 +87,7 @@ def submit_answer(room_id: int, user_answer: UserAnswer, repo: DatabaseRepositor
     question, correct_answers, answers = crud_questions.get_question_by_id(repo, user_answer.question_id)
     
     if history_entry is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Что-то пошло не так при отправке ответа.")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Что-то пошло не так при отправке ответа. Попробуйте ещё раз или, если ошибка повторилась, обратитесь в техническую поддержку.")
 
     return SubmitAnswerResponse(is_answer_correct=history_entry.correctly_answered, 
                                 hint=question.hint,

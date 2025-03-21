@@ -16,11 +16,11 @@ router = APIRouter(prefix="", tags=["user"])
 def new_user(user_credentials: UserRegister, user_info: UserModel, repo: DatabaseRepository= Depends(get_repo)):
     db_user_id = crud_credentials.get_user_id_by_login(repo, user_credentials.login)
     if db_user_id:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Данный логин уже занят.")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Данный логин уже занят. Пожалуйста, выберите другой логин.")
     user_credentials.password = security.get_password_hash(user_credentials.password)
     user_id = crud_credentials.create_user(repo, user_info, CredentialsModel(login=user_credentials.login, password_hash=user_credentials.password))
     if user_id is None:
-         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Пользовательские данные некорректны.")
+         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Предоставлены некорректные данные пользователя. Пожалуйста, проверьте правильность заполнения всех обязательных полей и попробуйте снова.")
     return {}
 
 
@@ -31,11 +31,11 @@ def token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], repo: Data
 
     if db_credentials is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, 
-                            detail='Неверный логин.')
+                            detail='Неверный логин. Проверьте правильность логина или зарегистрируйтесь, если у вас нет аккаунта.')
 
     if not security.authenticate_user(db_credentials, password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, 
-                            detail='Неверный пароль.',
+                            detail='Неверный пароль. Пожалуйста, попробуйте снова.',
                             headers={"WWW-Authenticate": "Bearer"})
     
     access_token = security.create_access_token(data={"sub": username})
@@ -48,11 +48,11 @@ def login(credentials: CredentialsAccept, repo: DatabaseRepository = Depends(get
 
     if db_credentials is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, 
-                            detail='Неверный логин.')
+                            detail='Неверный логин. Проверьте правильность логина или зарегистрируйтесь, если у вас нет аккаунта.')
 
     if not security.authenticate_user(db_credentials, credentials.password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, 
-                            detail='Неверный пароль.',
+                            detail='Неверный пароль. Пожалуйста, попробуйте снова.',
                             headers={"WWW-Authenticate": "Bearer"})
     
     access_token = security.create_access_token(data={"sub": credentials.login})
@@ -75,7 +75,7 @@ def get_user_stats(repo: DatabaseRepository= Depends(get_repo), current_user_id:
     total_question_by_category = crud_questions.get_total_question_by_category(repo)
     
     if solved_question_by_user is None or total_question_by_category is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Что-то пошло не так при получении статистики.")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Что-то пошло не так при получении статистики. Пожалуйста, попробуйте снова или обратитесь в техническую поддержку.")
 
     return UserStats(user_id=current_user_id, 
                     solved_questions_by_category_count=solved_question_by_user,

@@ -17,7 +17,7 @@ def get_question_for_user(question_type: QuestionType = None, difficulty: int = 
     question, options = crud_questions.get_question_by_parameters(repo, current_user_id, QuestionRequest(type=question_type, difficulty=difficulty, category=category, room_id=room_id, session_id=None))
     
     if question is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Вопрос не найден.")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Новый вопрос не найден! Кажется, Вы всё прошли :)")
     
     return QuizQuestion(
         id=question.id,
@@ -32,7 +32,7 @@ def get_question_for_user(question_type: QuestionType = None, difficulty: int = 
 def get_question_by_id(question_id: int, repo: DatabaseRepository = Depends(get_repo)):
     question, correct_answers, answers = crud_questions.get_question_by_id(repo, question_id)
     if question is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Вопрос с данным id не найден.")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Вопрос с данным id не найден. Пожалуйста, проверьте корректность id.")
     return QuizQuestion(
         id=question.id,
         question=question.text,
@@ -49,7 +49,7 @@ def submit_answer(user_answer: UserAnswer, repo: DatabaseRepository = Depends(ge
     question, correct_answers, answers = crud_questions.get_question_by_id(repo, user_answer.question_id)
     
     if history_entry is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Что-то пошло не так при отправке ответа.")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Не удалось отправить ответ. Пожалуйста, проверьте формат ответа и попробуйте снова. Если проблема сохраняется, обновите страницу.")
 
     return SubmitAnswerResponse(is_answer_correct=history_entry.correctly_answered, 
                                 hint=question.hint,
@@ -59,7 +59,7 @@ def submit_answer(user_answer: UserAnswer, repo: DatabaseRepository = Depends(ge
 @router.post("/new", status_code=status.HTTP_201_CREATED, response_model=int)
 def create_new_question(new_question: SubmitNewQuestion, repo: DatabaseRepository = Depends(get_repo), current_user_id: int = Depends(security.get_current_user_id)):
     if not crud_users.is_user_root(repo, current_user_id):
-         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Пользователь должен иметь права администратора.")
+         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Требуются права администратора для создания нового вопроса. Перейдите по ссылке, чтобы запросить административные права: admin/request-access.")
     question = crud_questions.create_question(repo, new_question)
     return question.id
     

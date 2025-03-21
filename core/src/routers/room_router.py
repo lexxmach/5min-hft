@@ -12,7 +12,7 @@ router = APIRouter(prefix="/rooms", tags=["rooms"])
 @router.post("/", response_model=int)
 def create_room(room_info: RoomCreate, repo: DatabaseRepository = Depends(get_repo), current_user_id: int = Depends(security.get_current_user_id)):
     if not crud_users.is_user_root(repo, current_user_id):
-         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Пользователь должен иметь права администратора.")
+         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Требуются права администратора для создания новой комнаты. Перейдите по ссылке, чтобы запросить административные права: admin/request-access.")
     return crud_rooms.create_room(repo, room_info, current_user_id)
 
 
@@ -25,9 +25,8 @@ def get_rooms(repo: DatabaseRepository = Depends(get_repo), current_user_id: int
 @router.get("/{room_id}", response_model=RoomResponse)
 def get_room(room_id: int, repo: DatabaseRepository = Depends(get_repo)):
     room = crud_rooms.get_room_by_id(repo, room_id)
-    
     if room is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Комната не найдена.")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Комната не найдена. Пожалуйста, проверьте ID комнаты и попробуйте снова.")
     
     return RoomResponse(id=room.id, name=room.name, owner_id=room.owner_id, duration=room.duration, 
                          min_start_time=room.min_start_time, max_start_time=room.max_start_time)
@@ -37,11 +36,11 @@ def delete_room(room_id: int, repo: DatabaseRepository = Depends(get_repo), curr
     room = crud_rooms.get_room_by_id(repo, room_id)
     
     if room is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Комната не найдена.")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Комната не найдена. Пожалуйста, проверьте ID комнаты и попробуйте снова.")
     
     if room.owner_id != current_user_id:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, 
-                            detail='Not an owner.')
+                            detail='Для удаления комнаты нужно быть её создателем. Пожалуйста, войдите в аккаунт, с которого Вы создавали комнату.')
     
     crud_rooms.delete_room(repo, room_id)
     
@@ -53,10 +52,10 @@ def add_questions_to_room(room_id: int, questions: QuestionsToRoomAdd, repo: Dat
     room = crud_rooms.get_room_by_id(repo, room_id)
     
     if room is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Комната не найдена.")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Комната не найдена. Пожалуйста, проверьте ID комнаты и попробуйте снова.")
     if room.owner_id != current_user_id:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, 
-                            detail='Not an owner.')
+                            detail='Для добавления вопросов в комнату нужно быть её создателем. Пожалуйста, войдите в аккаунт, с которого Вы создавали комнату.')
     
     crud_rooms.add_questions_to_room(repo, questions, room_id)
     return {"message": "Questions added"}
