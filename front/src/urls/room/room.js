@@ -76,11 +76,15 @@ class Room extends React.Component {
         for (let i = 0; i < this.state.rooms.length; ++i) {
             result.push(
                 <div className='room-list-room'>
-                    <div className='room-list-room-number'>
-                        <span>{i + 1}.</span>
-                        <span className='bold'>{this.state.rooms[i].name}</span>
+                    <div className='splitter'>
+                        <div className='room-list-room-number'>
+                            <span>{i + 1}.</span>
+                            <span className='bold'>{this.state.rooms[i].name}</span>
+                        </div>
+                        <span>id = {this.state.rooms[i].id}</span>
                     </div>
                     <div className='room-list-room-buttons'>
+                        <button className='room-button-blue' onClick={(e) => {e.preventDefault(); window.location.href='/create/question';}}>Добавить вопрос</button>
                         <button className='room-button' onClick={() => {navigator.clipboard.writeText(process.env.REACT_APP_FRONT_URL + 'exam_sessions/start?room_id=' + this.state.rooms[i].id.toString())}}>Скопировать ссылку</button>
                         <button className='room-button-blue' onClick={() => {this.onResults(this.state.rooms[i].id)}}>Результаты</button>
                     </div>
@@ -109,8 +113,8 @@ class Room extends React.Component {
             url, {
                 'name': this.state.room_name,
                 'duration_seconds': Number(this.state.duration) * 60,
-                'min_start_time': this.state.start_time,
-                'max_start_time': this.state.end_time
+                'min_start_time': this.state.start_time + '+03:00',
+                'max_start_time': this.state.end_time + '+03:00'
             }, {
                 headers: {
                     Authorization: 'Bearer ' + token
