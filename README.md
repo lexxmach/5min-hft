@@ -12,6 +12,7 @@
 
 ## Документации:
 - Основное: [docs/](./docs/)
+- Карточка проекта: [docs/project-card.png](docs/project-card.png)
 - PRD: [docs/PRD.pdf](docs/PRD.pdf)
 - Диаграмма Ганта: https://docs.google.com/spreadsheets/d/19IxDveW5Dm3P16UAxXZXRiz_nkg1MDE4at7p8hFMfkA/edit?gid=0#gid=0
 - Технический радар: https://docs.google.com/spreadsheets/d/1XgmF2gqGeEAsDxNcD5gmT8FLyCRNOpxdnDFTm9zotzo/edit?gid=0#gid=0
