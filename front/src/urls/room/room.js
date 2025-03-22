@@ -1,12 +1,14 @@
 import React from "react";
 import axios from "axios";
 import { exportToExcel  } from "react-json-to-excel";
+import { Navigate } from "react-router-dom";
 import './room.css';
 
 class Room extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            redirect: false,
             is_root: true,
             rooms: [],
             room_name: '',
@@ -16,6 +18,7 @@ class Room extends React.Component {
         this.genRoomsList = this.genRoomsList.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.submitForm = this.submitForm.bind(this);
     }
 
     componentDidMount() {
@@ -128,7 +131,25 @@ class Room extends React.Component {
         })
     }
 
+    submitForm() {
+        const token = localStorage.getItem('token');
+
+        let url = process.env.REACT_APP_BACK_URL + 'admin/request-access';
+        axios.post(url, {}, {
+            headers: {
+                Authorization: 'Bearer ' + token
+            }
+        }).then(res => {
+            this.setState({redirect: true})
+        });
+    }
+
     render() {
+        if (this.state.redirect) {
+            return (
+                <Navigate to={'/'} />
+            )
+        }
         if (!this.state.is_root) {
             return (
                 <>
