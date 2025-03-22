@@ -11,11 +11,11 @@
 Примеры мини-игр: что выведет код, посчитать сложность алгоритма, построчно выполнить код программы. Так же, есть возможность проведения собственного экзамена: наша платформа предоставляет возмонжость и для этого.
 
 # Документации:
-
-PRD: ![Структура базы данных](/docs/) 
-Диаграмма Ганта: https://docs.google.com/spreadsheets/d/19IxDveW5Dm3P16UAxXZXRiz_nkg1MDE4at7p8hFMfkA/edit?gid=0#gid=0
-Технический радар: https://docs.google.com/spreadsheets/d/1XgmF2gqGeEAsDxNcD5gmT8FLyCRNOpxdnDFTm9zotzo/edit?gid=0#gid=0
-Интерактивная структура базы данных: https://dbdiagram.io/d/hft-5-min-6728b564e9daa85aca3cf2ea
+- Основное: [docs/](./docs/)
+- PRD: [docs/PRD.pdf](docs/PRD.pdf)
+- Диаграмма Ганта: https://docs.google.com/spreadsheets/d/19IxDveW5Dm3P16UAxXZXRiz_nkg1MDE4at7p8hFMfkA/edit?gid=0#gid=0
+- Технический радар: https://docs.google.com/spreadsheets/d/1XgmF2gqGeEAsDxNcD5gmT8FLyCRNOpxdnDFTm9zotzo/edit?gid=0#gid=0
+- Интерактивная структура базы данных: https://dbdiagram.io/d/hft-5-min-6728b564e9daa85aca3cf2ea
 
 # Техническое:
 
