@@ -16,6 +16,7 @@
 - PRD: [docs/PRD.pdf](docs/PRD.pdf)
 - Диаграмма Ганта: https://docs.google.com/spreadsheets/d/19IxDveW5Dm3P16UAxXZXRiz_nkg1MDE4at7p8hFMfkA/edit?gid=0#gid=0
 - Технический радар: https://docs.google.com/spreadsheets/d/1XgmF2gqGeEAsDxNcD5gmT8FLyCRNOpxdnDFTm9zotzo/edit?gid=0#gid=0
+- Матрица планирования Хосин-Канри: https://docs.google.com/spreadsheets/d/1RU-CMqkQ88slHYeuyPCwcD5cqCkfdI2e/edit?usp=sharing&ouid=102374390749273509030&rtpof=true&sd=true
 - Интерактивная структура базы данных: https://dbdiagram.io/d/hft-5-min-6728b564e9daa85aca3cf2ea
 
 ## Скриншоты
