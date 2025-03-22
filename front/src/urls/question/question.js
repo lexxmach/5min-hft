@@ -231,7 +231,7 @@ class Question extends React.Component {
                         <a href='/profile' className='header-href'>{this.state.name}</a>
                     </div>
                     <div className='question-main'>
-                        <h1 className='question-label'>Воспрос №{this.state.question_id}:</h1>
+                        <h1 className='question-label'>Вопрос №{this.state.question_id}:</h1>
                         <div className='wide-element'>
                             <div className='splitter'>
                                 <span className='question-info'>Сложность: {this.state.difficulty}</span>
