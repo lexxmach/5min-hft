@@ -67,6 +67,9 @@ class Room extends React.Component {
         }).then(res => {
             let data = res.data;
             exportToExcel(data['questions'], 'results_' + i.toString() + '.json')
+        }).catch(function (error) {
+            let data = error.response.data
+            alert(data.detail)
         });
     }
 
@@ -85,9 +88,9 @@ class Room extends React.Component {
                     </div>
                     <div className='room-list-room-buttons'>
                         <button className='room-button' onClick={(e) => {e.preventDefault(); window.location.href='/create/question';}}>Добавить вопрос</button>
-                        <button className='room-button-blue' onClick={() => {navigator.clipboard.writeText(process.env.REACT_APP_FRONT_URL + 'exam_sessions/start?room_id=' + this.state.rooms[i].id.toString())}}>Скопировать ссылку</button>
-                        <button className='room-button' onClick={() => {this.onResults(this.state.rooms[i].id)}}>Результаты</button>
+                        <button className='room-button-blue' onClick={() => {this.onResults(this.state.rooms[i].id)}}>Результаты</button>
                     </div>
+                    <a href={process.env.REACT_APP_FRONT_URL + 'exam_sessions/start?room_id=' + this.state.rooms[i].id.toString()} className='room-start-ref'>Ссылка на старт экзамена</a>
                 </div>
             )
         }

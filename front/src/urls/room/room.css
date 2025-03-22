@@ -58,14 +58,14 @@
 
 .room-button {
     width: 300px;
-    height: 70px;
+    height: 40px;
     font-size:20px;
     padding-top: 2px;
 }
 
 .room-button-blue {
     width: 300px;
-    height: 70px;
+    height: 40px;
     font-size:20px;
     padding-top: 2px;
     color: rgb(255, 255, 255);
@@ -108,4 +108,12 @@
 
 .room-form-splitter span {
     font-size: 30px;
+}
+
+.room-start-ref {
+    text-decoration: none;
+    color: blue;
+    font-size: 25px;
+    font-weight: bold;
+    padding-top: 20px;
 }
