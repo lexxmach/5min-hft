@@ -62,7 +62,7 @@ class Room extends React.Component {
     onResults(i) {
         const token = localStorage.getItem('token');
 
-        let url = process.env.REACT_APP_BACK_URL + 'exam_sessions/results/' + i.toString();
+        let url = process.env.REACT_APP_BACK_URL + 'exam_sessions/results/all/' + i.toString();
         axios.get(url, {
             headers: {
                 Authorization: 'Bearer ' + token
