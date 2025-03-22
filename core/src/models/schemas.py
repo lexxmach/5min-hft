@@ -125,6 +125,8 @@ class QuestionStatusInSessionResult(BaseModel):
     question_id: int
     question_status: QuestionStatusType
     user_id: int
+    user_name: str
+    user_surname: str
 
 class SessionResult(BaseModel):
     questions: list[QuestionStatusInSessionResult]

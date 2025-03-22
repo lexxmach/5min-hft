@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import RedirectResponse
 from dependencies import get_repo
 from common.repo.repository import DatabaseRepository
-from cruds import crud_exam_sessions, crud_rooms, crud_questions
+from cruds import crud_exam_sessions, crud_rooms, crud_questions, crud_users
 from models.schemas import ExamSessionResponse, QuestionRequest, QuestionStatusInSessionResult, QuizQuestion, SessionResult, SubmitAnswerResponse, UserAnswer
 import pytz
 
@@ -120,8 +120,10 @@ def get_exam_results(room_id: int, repo: DatabaseRepository = Depends(get_repo),
     if results is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Не найдена экзаменационная сессия для данной комнаты.")
     questions, statuses = results
+    user_info = crud_users.get_user_by_user_id(repo, current_user_id)
     
-    return SessionResult(questions=[QuestionStatusInSessionResult(user_id=current_user_id, question_id=question.id, question_status=q_status) for question, q_status in zip(questions, statuses)])
+    return SessionResult(questions=[QuestionStatusInSessionResult(user_id=current_user_id, user_name=user_info.name,
+                                                                user_surname=user_info.surname, question_id=question.id, question_status=q_status) for question, q_status in zip(questions, statuses)])
 
 
 @router.get("/complete/{room_id}")
@@ -140,7 +142,7 @@ def manually_complete_session(room_id: int, repo: DatabaseRepository = Depends(g
 def get_all_exam_results(room_id: int, repo: DatabaseRepository = Depends(get_repo)):
     sessions = crud_exam_sessions.get_all_sessions_by_room_id(repo, room_id)
     if sessions is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Не найдена экзаменационная сессия для данной комнаты.")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Не найдены экзаменационные сессии для данной комнаты. Может быть, никто не начал экзамен ещё?")
 
     results = []
     for session in sessions:
@@ -148,5 +150,7 @@ def get_all_exam_results(room_id: int, repo: DatabaseRepository = Depends(get_re
         if result is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Не выгрузились результаты. Попробуйте позже.")   
         questions, statuses = result
-        results.append(SessionResult(questions=[QuestionStatusInSessionResult(user_id=session.user_id, question_id=question.id, question_status=q_status) for question, q_status in zip(questions, statuses)]))
+        user_info = crud_users.get_user_by_user_id(repo, session.user_id)
+        results.append(SessionResult(questions=[QuestionStatusInSessionResult(user_id=session.user_id, user_name=user_info.name,
+                                                                              user_surname=user_info.surname, question_id=question.id, question_status=q_status) for question, q_status in zip(questions, statuses)]))
     return results
