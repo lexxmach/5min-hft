@@ -69,7 +69,7 @@ class Room extends React.Component {
             }
         }).then(res => {
             let data = res.data;
-            exportToExcel(data['questions'], 'results_' + i.toString() + '.json')
+            exportToExcel(data[0]['questions'], 'results_' + i.toString() + '.json')
         }).catch(function (error) {
             let data = error.response.data
             alert(data.detail)
